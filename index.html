@@ -66,6 +66,11 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,.gap:focus-visib
 .hero{display:flex; flex-direction:column; gap:10px}
 .lede{color:var(--muted); font-size:1.02rem}
 .back{background:var(--mark); color:var(--mark-ink); padding:10px 14px; border-radius:6px; font-weight:500}
+.hw{border-left:4px solid var(--accent); background:var(--surface); padding:10px 14px; border-radius:0 8px 8px 0; display:flex; flex-direction:column; gap:2px}
+.hw b{font-weight:600}
+.hw .sub{color:var(--muted); font-size:.9rem}
+.week td:first-child{white-space:nowrap; font-weight:600}
+.week tr.now td{background:var(--accent-soft)}
 
 /* modes */
 .modes{display:grid; grid-template-columns:repeat(3,1fr); gap:8px}
@@ -198,8 +203,9 @@ footer{color:var(--muted); font-size:.84rem; border-top:1px solid var(--line); p
   <section class="hero">
     <span class="eyebrow">MIT Media Lab · 2027</span>
     <h1>오늘은 이것만.</h1>
-    <p class="lede">순서는 정해져 있어요. 고를 건 오늘 컨디션 하나뿐이에요. 문제는 시트에서 아직 안 푼 것부터 차례로 와요.</p>
+    <p class="lede">오늘 숙제는 한 줄이에요. 모드는 요일에 맞춰 미리 골라 뒀고, 문제는 시트에서 아직 안 푼 것부터 차례로 와요.</p>
     <p class="back" id="back" hidden></p>
+    <div class="hw" id="hw"></div>
   </section>
 
   <section class="modes" aria-label="오늘 컨디션">
@@ -246,6 +252,17 @@ footer{color:var(--muted); font-size:.84rem; border-top:1px solid var(--line); p
     <div class="cells" id="cells"></div>
     <p class="note" id="ledgerNote"></p>
     <div class="stat" id="stat"></div>
+  </section>
+
+  <section class="road">
+    <h2>주간 숙제</h2>
+    <p class="note">시간표에 맞춘 고정 틀이에요. 아침 영어 블록은 보너스예요. 일어나면 5분, 못 일어나도 숙제는 그대로 남아요.</p>
+    <div class="tablewrap">
+      <table class="week">
+        <thead><tr><th>요일</th><th>언제</th><th>딱 이것만</th><th>흘려듣기 30분</th></tr></thead>
+        <tbody id="weekBody"></tbody>
+      </table>
+    </div>
   </section>
 
   <section class="road">
@@ -374,7 +391,7 @@ function shuffle(a){a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floo
 
 /* ---------- state ---------- */
 const KEY='toefl-today:v2', OLD='toefl-today:v1', CACHE='toefl-today:bank';
-let state={log:{},drafts:{},memo:{},done:{},skipped:{},today:null,writeCount:0,testDate:'2027-03-13',appDate:'2027-12-15',mode:null};
+let state={log:{},drafts:{},memo:{},done:{},skipped:{},today:null,writeCount:0,testDate:'2027-03-13',appDate:'2027-12-15',mode:null,modeDate:null};
 try{ const raw=localStorage.getItem(KEY); if(raw) state=Object.assign(state,JSON.parse(raw)); else { const old=localStorage.getItem(OLD); if(old){ const o=JSON.parse(old); ['log','drafts','memo','testDate','appDate','mode'].forEach(k=>{ if(o[k]!=null) state[k]=o[k]; }); } } }catch(e){}
 function save(){ try{ localStorage.setItem(KEY,JSON.stringify(state)); }catch(e){} }
 
@@ -388,6 +405,32 @@ $('chipTest').addEventListener('click',toggleDates); $('chipApp').addEventListen
 $('testDate').addEventListener('change',e=>{ if(e.target.value){ state.testDate=e.target.value; save(); renderCounts(); } });
 $('appDate').addEventListener('change',e=>{ if(e.target.value){ state.appDate=e.target.value; save(); renderCounts(); } });
 $('sheetLink').href=SHEET_URL;
+
+/* ---------- weekday prescription (fixed to the timetable) ---------- */
+const DAYS=['일','월','화','수','목','금','토'];
+let WEEK=[
+  {d:'일',mode:25,when:'아무 때나 25분 + 15분 정리',what:'25분 모드. 끝나면 이번 주 줄들을 시트에 붙이고, 클로드에 "지시문 탭 읽고 피드백 채워줘".',listen:'작품 하면서 배경으로'},
+  {d:'월',mode:25,when:'회사 끝나는 7시, 바로',what:'25분 모드. 앉은 자리에서 바로 시작, 그다음에 저녁.',listen:'저녁 준비하고 정리하면서'},
+  {d:'화',mode:5,when:'퇴근길 또는 집에 와서',what:'5분 모드만. 출근날은 이게 전부예요.',listen:'출퇴근 길 왕복'},
+  {d:'수',mode:25,when:'기계과외 끝나는 7시 30분, 작품 전에',what:'25분 모드. 병원 가는 날이면 이동 중 흘려듣기 + 5분 모드.',listen:'병원 이동, 보컬 가는 길'},
+  {d:'목',mode:25,when:'회사 끝나는 6시, 바로',what:'25분 모드. 운동이나 약속은 그다음에.',listen:'운동 가는 길과 오는 길'},
+  {d:'금',mode:25,when:'회사 끝나는 6시, 과외 전에',what:'25분 모드. 과외엔 이번 주 쓴 글 1편과 인터뷰 질문 2개를 가져가서 말하기 교정 받기.',listen:'점심 먹으면서'},
+  {d:'토',mode:50,when:'작품 끝나는 3시',what:'50분 모드. 아침에 일어났다면 해커스 리스닝 인강 1강, 책은 이것만.',listen:'작품 하면서 배경으로'}
+];
+const DOWI=today.getDay(); let RX=WEEK[DOWI];
+function renderHw(){ RX=WEEK[DOWI]; const h=$('hw'); h.textContent=''; const parts=RX.what.split('.'); h.appendChild(el('b',null,'오늘 숙제 · '+RX.d+'요일: '+RX.when+' '+parts[0].trim()+'.')); h.appendChild(el('span','sub',(parts.slice(1).join('.').trim()+' 흘려듣기 30분: '+RX.listen+'.').trim())); }
+function renderWeek(){ const tb=$('weekBody'); tb.textContent=''; WEEK.forEach((w,i)=>{ const tr=el('tr',i===DOWI?'now':''); tr.appendChild(el('td',null,w.d)); tr.appendChild(el('td',null,w.when)); tr.appendChild(el('td',null,w.what)); tr.appendChild(el('td',null,w.listen)); tb.appendChild(tr); }); }
+async function loadWeek(){
+  try{
+    const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),8000);
+    const url='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:json&headers=1&sheet='+encodeURIComponent('주간')+'&_='+Date.now();
+    const res=await fetch(url,{signal:ctrl.signal,cache:'no-store'}); clearTimeout(t);
+    if(!res.ok) return;
+    const rows=parseGviz(await res.text());
+    const w=rows.map(r=>({d:String(r['요일']||'').trim().slice(0,1),mode:Number(r['모드'])||25,when:String(r['언제']||'').trim(),what:String(r['딱 이것만']||'').trim(),listen:String(r['흘려듣기']||'').trim()})).filter(x=>DAYS.includes(x.d)&&x.what);
+    if(w.length>=5){ WEEK=DAYS.map((d,i)=>w.find(x=>x.d===d)||WEEK[i]); }
+  }catch(e){}
+}
 
 /* ---------- returning notice ---------- */
 const pastKeys=Object.keys(state.log).filter(k=>k<TK).sort();
@@ -640,7 +683,7 @@ function renderRun(){
   });
   $('finish').hidden=!(log&&log.finished&&log.finished>=mode);
 }
-function setMode(m,persist){ mode=m; if(persist){ state.mode=m; save(); } document.querySelectorAll('.mode').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.mode)===m))); renderRun(); }
+function setMode(m,persist){ mode=m; if(persist){ state.mode=m; state.modeDate=TK; save(); } document.querySelectorAll('.mode').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.mode)===m))); renderRun(); }
 document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>setMode(Number(b.dataset.mode),true)));
 
 /* ---------- timer ---------- */
@@ -699,8 +742,9 @@ document.querySelectorAll('#roadBody tr').forEach(tr=>{ if(TK>=tr.dataset.from&&
 
 /* ---------- boot ---------- */
 (async function(){
-  await loadBank();
-  const startMode=(state.log[TK]&&state.log[TK].finished)?state.log[TK].finished:(gap>=3&&!state.log[TK]?5:(state.mode||25));
+  await Promise.all([loadBank(),loadWeek()]);
+  renderHw(); renderWeek();
+  const startMode=(state.log[TK]&&state.log[TK].finished)?state.log[TK].finished:(gap>=3&&!state.log[TK]?5:((state.modeDate===TK&&state.mode)?state.mode:RX.mode));
   setMode(startMode,false);
   renderLedger();
 })();
