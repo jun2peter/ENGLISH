@@ -150,6 +150,13 @@ textarea.short{min-height:70px}
 .ct{font-size:1.02rem; line-height:1.8}
 .gap{font-family:var(--mono); background:var(--accent-soft); border-radius:4px; padding:0 4px; cursor:pointer; letter-spacing:.02em}
 .gap.open{background:var(--good-soft); color:var(--good)}
+.gapw{display:inline-flex; align-items:baseline; background:var(--accent-soft); border-radius:4px; padding:0 3px; margin:0 1px; line-height:1.5}
+.gapw .pre{font-family:var(--mono)}
+.gapin{font:inherit; font-family:var(--mono); font-size:1rem; border:0; border-bottom:2px solid var(--accent); background:transparent; color:var(--fg); padding:0 1px; min-width:1.6em}
+.gapin:focus{outline:none; border-bottom-color:var(--fg)}
+.gapw.right{background:var(--good-soft)} .gapw.right .gapin{border-bottom-color:var(--good); color:var(--good)}
+.gapw.wrong{background:var(--warn-soft)} .gapw.wrong .gapin{border-bottom-color:var(--warn); color:var(--warn)}
+.gapans{font-family:var(--mono); color:var(--good); font-size:.9rem; margin-left:4px}
 .yday{border-left:3px solid var(--line); padding:4px 12px; color:var(--muted); font-size:.92rem; white-space:pre-wrap}
 
 /* coach */
@@ -221,15 +228,15 @@ footer{color:var(--muted); font-size:.84rem; border-top:1px solid var(--line); p
   <section class="modes" aria-label="오늘 컨디션">
     <button class="mode" type="button" data-mode="5" aria-pressed="false">
       <span class="m-name">무너진 날</span><span class="m-time">5분</span>
-      <span class="m-desc">이 페이지 안에서만. 아무것도 안 열어도 돼요.</span>
+      <span class="m-desc">빈칸 문단 하나, 문장 조립 셋. 아무것도 안 열어도 돼요.</span>
     </button>
     <button class="mode" type="button" data-mode="25" aria-pressed="false">
       <span class="m-name">보통</span><span class="m-time">25분</span>
-      <span class="m-desc">따라 말하기, 실제 음원 듣기, 인터뷰, 쓰기 한 바퀴.</span>
+      <span class="m-desc">소리 내어 읽기, 실제 음원 듣기, 인터뷰, 빈칸, 쓰기 한 바퀴.</span>
     </button>
     <button class="mode" type="button" data-mode="50" aria-pressed="false">
       <span class="m-name">좋은 날</span><span class="m-time">50분</span>
-      <span class="m-desc">한 바퀴에 긴 강의 요약, 단어 완성 읽기, 복습까지.</span>
+      <span class="m-desc">한 바퀴에 긴 강의 요약, 빈칸 하나 더, 복습까지.</span>
     </button>
   </section>
 
@@ -301,7 +308,7 @@ footer{color:var(--muted); font-size:.84rem; border-top:1px solid var(--line); p
     <h2>확인한 사실</h2>
     <ul>
       <li>토플은 2026년 1월부터 새 형식이에요. 읽기 50문항 30분, 듣기 47문항 29분, 쓰기 12문항 23분, 말하기 11문항 8분, 전체 약 2시간. 섹션마다 1~6 밴드로 채점하고, 2028년 1월까지는 0~120 환산 점수도 함께 나와요. (<a href="https://www.ets.org/toefl/test-takers/ibt/about/content.html">ETS 시험 구성</a>)</li>
-      <li>새 문제 유형: 단어 완성(Complete the Words), 듣고 따라 말하기(Listen and Repeat), 인터뷰, 문장 조립(Build a Sentence), 이메일 쓰기, 학술 토론 쓰기, 대화·안내·강의 듣기. 이 페이지의 과제가 그 유형들이에요. 예전 형식 교재는 기초 재료로만 쓰세요.</li>
+      <li>새 문제 유형: 빈칸 단어 완성(Complete the Words), 듣고 따라 말하기(Listen and Repeat), 인터뷰, 문장 조립(Build a Sentence), 이메일 쓰기, 학술 토론 쓰기, 대화·안내·강의 듣기. 이 페이지의 과제가 그 유형들이고, 듣기는 실제 음원 사이트로 해요. 예전 형식 교재는 기초 재료로만 쓰세요.</li>
       <li>MIT 미디어랩(MAS): TOEFL iBT 100 또는 IELTS 7 최소, 면제 없음, 2년 이내 점수. GRE 불필요. 2026년 접수는 9/15~12/15였고 2027년도 같은 패턴일 가능성이 커요. 1~6 밴드 환산 기준은 아직 명시되지 않았으니 지원 전에 다시 확인. (<a href="https://www.media.mit.edu/graduate-program/apply/">지원 안내</a> · <a href="https://www.media.mit.edu/posts/ielts-requirement-for-international-students/">영어 요건</a> · <a href="https://oge.mit.edu/programs/media-arts-and-sciences/">MIT 대학원 MAS</a>)</li>
       <li>포트폴리오는 전자 제출만, URL 또는 PDF. 그룹에 맞게 골라서 설명을 붙이는 게 핵심이에요. (<a href="https://www.media.mit.edu/posts/academics-portfolio-requirements/">포트폴리오 요건</a>)</li>
     </ul>
@@ -367,12 +374,6 @@ const C=[
 "Coral reefs are built by tiny animals called polyps, which produce hard skeletons of calcium carbonate. Over thousands of years, these skeletons accumulate into enormous structures. Reefs provide shelter for a huge variety of fish and other sea creatures. When ocean water becomes too warm, corals expel the algae that give them color and food, a process called bleaching.",
 "Early photography required long exposure times, so subjects had to stay still for several minutes. Portrait studios used clamps to hold a person's head in place. As chemical processes improved, exposure times dropped to a fraction of a second. This change made it possible to photograph moving subjects for the first time.",
 "Many animals use camouflage to avoid predators or to surprise their prey. Some insects resemble leaves or twigs so closely that birds pass them by. Certain fish can change their color to match the sea floor within seconds. Camouflage works because predators rely on vision to find food, and anything that breaks the expected pattern is hard to notice."];
-const L=[
-["W: Hi, I'm looking for the biology lab. Is it in this building?\nM: It was, but they moved it to the science center last month. Take the elevator to the third floor.\nW: Oh, I didn't know that. Is the center far from here?\nM: It's the gray building across the parking lot, about a two-minute walk.","Where is the biology lab now?","On the third floor of this building | *On the third floor of the science center | In the parking lot | In the library"],
-["M: Attention, passengers. The 9:15 train to Boston is delayed by about twenty minutes because of signal repairs. Passengers with connecting trains should speak to staff at the information desk. We apologize for the inconvenience.","What should passengers with connections do?","Wait on the platform | Buy a new ticket | *Talk to staff at the information desk | Take the 9:15 train"],
-["Prof: Today I want to talk about why the Roman army built such straight roads. The main reason was speed. A straight road meant soldiers could move between towns quickly, and messages could travel in days rather than weeks. Engineers used a simple tool, a wooden frame with hanging weights, to keep the line straight over long distances.","According to the professor, why were Roman roads straight?","To save building materials | *So that soldiers and messages could move quickly | Because the land was flat | To impress visitors"],
-["W: Did you finish the group presentation slides?\nM: Almost. I still need the chart from Dana, and she hasn't replied to my message.\nW: She's in the library right now. I can ask her to send it in the next hour.\nM: That would be great. Then I can finish everything before tonight.","What is the man waiting for?","A reply from the professor | A room reservation | *A chart from Dana | A new laptop"]];
-
 const A=[
 ["VOA Learning English (느린 속도, 자막)","https://learningenglish.voanews.com/","2분 안팎의 영상이나 오디오 하나 고르기;자막 없이 한 번 듣고 무슨 내용인지 한 문장으로 말하기;자막 보며 한 번 더 듣기;한 문단을 골라 동시에 따라 말하기 2번"],
 ["BBC 6 Minute English (대화, 대본, 단어 풀이)","https://www.bbc.co.uk/learningenglish/english/features/6-minute-english","가장 최근 에피소드 열기;앞 3분만 듣고 진행자가 낸 퀴즈에 답하기;대본을 열어 못 들은 문장 2개 찾기;그 두 문장을 소리 내어 3번 읽기"],
@@ -387,7 +388,6 @@ A.forEach((x,i)=>BUILTIN.push({id:'A'+String(i+1).padStart(3,'0'),type:'audio',t
 R.forEach((t,i)=>BUILTIN.push({id:'R'+String(i+1).padStart(3,'0'),type:'repeat',text:t,a:'',b:'',level:Math.min(4,Math.floor(i/10)+1)}));
 B.forEach((t,i)=>BUILTIN.push({id:'B'+String(i+1).padStart(3,'0'),type:'build',text:t,a:'',b:'',level:1}));
 Q.forEach((t,i)=>BUILTIN.push({id:'Q'+String(i+1).padStart(3,'0'),type:'interview',text:t,a:'',b:'',level:1}));
-L.forEach((x,i)=>BUILTIN.push({id:'L'+String(i+1).padStart(3,'0'),type:'listen',text:x[0],a:x[1],b:x[2],level:1}));
 D.forEach((x,i)=>BUILTIN.push({id:'D'+String(i+1).padStart(3,'0'),type:'discussion',text:x[0],a:x[1],b:x[2],level:2}));
 E.forEach((x,i)=>BUILTIN.push({id:'E'+String(i+1).padStart(3,'0'),type:'email',text:x[0],a:x[1],b:x[2],level:1}));
 C.forEach((t,i)=>BUILTIN.push({id:'C'+String(i+1).padStart(3,'0'),type:'ctest',text:t,a:'',b:'',level:2}));
@@ -439,14 +439,13 @@ function idRange(ids){ if(!ids||!ids.length) return ''; return ids.length>2 ? id
 function renderHwContent(list){
   const c=$('hwContent'); if(!c) return; const sets=state.today.sets; const p=[];
   list.forEach(s=>{
-    if(s.key==='repeat') p.push('따라 말하기 '+idRange(sets.repeat));
+    if(s.key==='repeat') p.push('소리 내어 읽기 '+idRange(sets.repeat));
     else if(s.key==='build') p.push('문장 조립 '+idRange(sets.build));
     else if(s.key==='audio'){ const it=BY[(sets.audio||[])[0]]; if(it) p.push('실제 음원 '+it.text.split('(')[0].trim()); }
     else if(s.key==='interview') p.push('인터뷰 '+idRange(sets.interview));
     else if(s.key==='writing'){ const it=BY[(sets.writing||[])[0]]; if(it) p.push((it.type==='discussion'?'학술 토론 쓰기 ':'이메일 쓰기 ')+it.id); }
     else if(s.key==='lecture') p.push('TED-Ed 강의 1개');
-    else if(s.key==='ctest') p.push('단어 완성 '+idRange(sets.ctest));
-    else if(s.key==='listen') p.push('기계 음성 듣기 '+idRange(sets.listen)+' (선택)');
+    else if(s.key==='ctest') p.push('빈칸 '+idRange(s.ids));
   });
   c.textContent='오늘 내용: '+p.join(' · ')+'. 내일은 그다음 문제가 와요.';
 }
@@ -532,7 +531,7 @@ async function loadBank(){
   if(SRC!=='sheet'){ try{ const c=JSON.parse(localStorage.getItem(CACHE)||'null'); if(c&&c.bank&&c.bank.length){ BANK=c.bank; SRC='cache'; } }catch(e){} }
   index();
   const n=t=>BANK.filter(x=>x.type===t).length;
-  const counts='따라 말하기 '+n('repeat')+' · 조립 '+n('build')+' · 음원 사이트 '+n('audio')+' · 인터뷰 '+n('interview')+' · 토론 '+n('discussion')+' · 이메일 '+n('email')+' · 단어 완성 '+n('ctest')+' · 기계 음성 듣기 '+n('listen');
+  const counts='소리 내어 읽기 '+n('repeat')+' · 조립 '+n('build')+' · 음원 사이트 '+n('audio')+' · 인터뷰 '+n('interview')+' · 토론 '+n('discussion')+' · 이메일 '+n('email')+' · 빈칸 '+n('ctest');
   $('bankInfo').textContent = SRC==='sheet' ? '문제은행: 구글 시트 "문제" 탭에서 방금 불러옴 ('+BANK.length+'개: '+counts+'). 시트에 줄을 추가하면 다음에 열 때 반영돼요.'
     : SRC==='cache' ? '문제은행: 시트에 연결이 안 돼서 마지막으로 받아 둔 사본을 써요 ('+BANK.length+'개).'
     : '문제은행: 시트에 연결이 안 돼서 페이지에 내장된 기본 문제를 써요 ('+BANK.length+'개). 시트가 "링크가 있는 모든 사용자"에게 열려 있는지 확인해요.';
@@ -548,7 +547,7 @@ function pickIds(type,n,exclude,random){
   if(out.length<n){ const dn=list.filter(x=>state.done[x.id]&&!ex.has(x.id)&&!out.includes(x.id)).sort((p,q)=>String(state.done[p.id]).localeCompare(String(state.done[q.id]))); out=out.concat(dn.slice(0,n-out.length).map(x=>x.id)); }
   return out;
 }
-const NEED={repeat:5,build:3,audio:1,listen:2,interview:2,ctest:1};
+const NEED={repeat:5,build:3,audio:1,interview:2,ctest:2};
 function ensureSets(force){
   if(!state.today||state.today.date!==TK||force){ state.today={date:TK,sets:{}}; }
   const sets=state.today.sets;
@@ -573,50 +572,34 @@ $('repick').addEventListener('click',()=>{ ensureSets(true); renderRun(); });
 
 /* ---------- steps per mode ---------- */
 function stepsFor(mode){
-  const sets=state.today.sets; const s=[];
-  s.push({key:'repeat',title:'문장 따라 말하기',min:mode===5?2:3,how:'문장마다 소리 내어 두 번. ▶는 기계 음성이라 어색할 수 있어요. 어색하면 ▶ 없이 읽고, 마지막 한 문장만 휴대폰 음성메모로 녹음해 들어봐요.',ids:sets.repeat,body:bodyRepeat});
-  if(mode===5){ s.push({key:'build',title:'문장 조립',min:3,how:'단어를 눌러 순서대로 문장을 만들어요. 틀려도 정답 보고 한 번 소리 내어 읽으면 끝.',ids:sets.build,body:bodyBuild}); return s; }
+  const sets=state.today.sets; const s=[]; const ct=sets.ctest||[];
+  const CT_HOW='지워진 뒷부분 스펠링을 직접 쳐 넣고 "확인". 틀린 칸은 정답이 옆에 떠요. 다 맞춘 뒤 문단을 소리 내어 한 번 읽어요.';
+  if(mode===5){
+    s.push({key:'ctest',ci:0,title:'빈칸 채우기',min:3,how:CT_HOW,ids:ct.slice(0,1),body:bodyCtest});
+    s.push({key:'build',title:'문장 조립',min:2,how:'단어를 눌러 순서대로 문장을 만들어요. 틀려도 정답 보고 한 번 소리 내어 읽으면 끝.',ids:sets.build,body:bodyBuild});
+    return s;
+  }
+  s.push({key:'repeat',title:'문장 소리 내어 읽기',min:2,how:'문장마다 소리 내어 두 번. 마지막 한 문장은 휴대폰 음성메모로 녹음해서 들어봐요.',ids:sets.repeat,body:bodyRepeat});
   s.push({key:'audio',title:'실제 음원 듣기',min:6,how:'사람 목소리로 듣는 시간이에요. 오늘의 사이트를 열고 아래 순서대로. 다 하면 ✓.',ids:sets.audio,body:bodyAudio});
   s.push({key:'interview',title:'인터뷰 답하기',min:5,how:'질문마다 15초 생각하고 45초 말해요. 멈추지 않는 게 목표이지, 맞는 문법이 목표가 아니에요.',ids:sets.interview,body:bodyInterview});
+  s.push({key:'ctest',ci:0,title:'빈칸 채우기',min:4,how:CT_HOW,ids:ct.slice(0,1),body:bodyCtest});
   const wt=sets.writeType;
   s.push({key:'writing',type:wt,title:wt==='discussion'?'학술 토론 쓰기':'이메일 쓰기',min:wt==='discussion'?10:7,how:wt==='discussion'?'교수 질문에 내 의견을 써요. 100단어 이상, 이유 하나에 예 하나, 두 학생 중 한 명과 다른 점 한 줄.':'80단어 이상. 인사, 용건, 세 가지 포인트, 마무리 인사 순서로.',ids:sets.writing,body:bodyWrite});
   if(mode===50){
     s.push({key:'lecture',title:'긴 강의 듣고 요약',min:10,how:'TED-Ed 4~6분 영상 하나. 들으면서 키워드만 적고, 다 듣고 60초 동안 영어로 요약해 말해요.',ids:[],body:bodyLecture});
-    s.push({key:'ctest',title:'단어 완성 읽기',min:5,how:'반쯤 지워진 단어를 소리 내어 채우며 읽어요. 막히면 단어를 눌러 확인.',ids:sets.ctest,body:bodyCtest});
-    s.push({key:'listen',title:'듣고 답하기 (기계 음성, 선택)',min:5,how:'대화나 안내를 듣고 질문에 답해요. 음성이 어색하면 "대본 보기"로 읽기 문제처럼 풀어도 돼요. 건너뛰어도 괜찮아요.',ids:sets.listen,body:bodyListen});
+    s.push({key:'ctest',ci:1,title:'빈칸 채우기 (하나 더)',min:4,how:'문단 하나 더. 이번엔 시간을 재고 막힘 없이 끝까지.',ids:ct.slice(1,2),body:bodyCtest});
     s.push({key:'review',title:'복습과 제출',min:4,how:'지난번에 쓴 글을 소리 내어 읽고, 오늘 글은 아래 "코치에게 보내기"로 보내요.',ids:[],body:bodyReview});
   }
   return s;
 }
 
-/* ---------- speech ---------- */
-const ttsOK=('speechSynthesis' in window)&&('SpeechSynthesisUtterance' in window);
-let voices=[]; let currentPlay=null;
-function pickVoices(){ try{ const vs=speechSynthesis.getVoices(); const en=vs.filter(v=>/^en/i.test(v.lang)); const us=en.filter(v=>/en[-_]US/i.test(v.lang)); const first=us.find(v=>/natural|google|aria|jenny|samantha/i.test(v.name))||us[0]||en[0]; const rest=en.filter(v=>v!==first); const second=rest.find(v=>/en[-_]US/i.test(v.lang)&&/natural|google|guy|davis|alex|daniel/i.test(v.name))||rest.find(v=>/en[-_](GB|AU)/i.test(v.lang))||rest[0]; voices=[first,second].filter(Boolean); }catch(e){} }
-if(ttsOK){ pickVoices(); try{ speechSynthesis.onvoiceschanged=pickVoices; }catch(e){} }
-function stopSpeech(){ try{ speechSynthesis.cancel(); }catch(e){} if(currentPlay){ currentPlay.classList.remove('on'); currentPlay=null; } }
-function speakLines(lines,btn,rate){
-  if(!ttsOK) return; stopSpeech(); currentPlay=btn; btn.classList.add('on');
-  const who={}; let vi=0, i=0;
-  const next=()=>{ if(currentPlay!==btn) return; if(i>=lines.length){ btn.classList.remove('on'); currentPlay=null; return; }
-    let line=lines[i++]; let sp='';
-    const m=line.match(/^([A-Za-z][A-Za-z .]{0,14}):\s*(.*)$/); if(m){ sp=m[1]; line=m[2]; }
-    if(!line.trim()){ next(); return; }
-    const u=new SpeechSynthesisUtterance(line); u.lang='en-US'; u.rate=rate||0.95;
-    if(voices.length){ if(!(sp in who)) who[sp]=voices[Math.min(vi++,voices.length-1)]; u.voice=who[sp]; }
-    u.onend=()=>setTimeout(next,250); u.onerror=()=>setTimeout(next,100);
-    speechSynthesis.speak(u); };
-  next();
-}
-function playBtn(label,lines,rate){ const b=el('button','play',label||'▶'); b.type='button'; b.setAttribute('aria-label','듣기'); if(ttsOK) b.addEventListener('click',()=>{ if(currentPlay===b){ stopSpeech(); } else speakLines(lines,b,rate); }); else b.disabled=true; return b; }
-
 /* ---------- bodies ---------- */
 function swapBtn(type,idx){ const b=el('button','btn small ghost swap','다른 문제'); b.type='button'; b.addEventListener('click',()=>swap(type,idx)); return b; }
 function bodyRepeat(box,ids){
   const ul=el('ul','lines');
-  ids.forEach((id,i)=>{ const it=BY[id]; const li=el('li'); li.appendChild(playBtn('▶',[it.text],0.92)); const s=el('span','en',it.text); li.appendChild(s); ul.appendChild(li); });
+  ids.forEach((id,i)=>{ const it=BY[id]; const li=el('li'); li.appendChild(el('span','s-n',String(i+1))); li.appendChild(el('span','en',it.text)); ul.appendChild(li); });
   box.appendChild(ul);
-  const row=el('div','s-act'); row.appendChild(el('span','note',ttsOK?'▶는 기기 내장 음성이라 어색할 수 있어요. 리듬만 참고하고, 내 목소리로 두 번 읽는 게 핵심.':'이 기기는 음성 재생이 안 돼요. 문장을 소리 내어 두 번씩 읽어요.'));
+  const row=el('div','s-act'); row.appendChild(el('span','note','모르는 단어가 있는 문장은 세 번. 녹음을 들어 보면 어디서 끊기는지 보여요.'));
   const sw=el('button','btn small ghost','문장 다섯 개 바꾸기'); sw.type='button'; sw.addEventListener('click',()=>{ ids.forEach(id=>state.skipped[id]=TK); state.today.sets.repeat=pickIds('repeat',5,[],false); save(); renderRun(); }); row.appendChild(sw);
   box.appendChild(row);
 }
@@ -634,31 +617,15 @@ function bodyBuild(box,ids){
     const check=el('button','btn small','확인'); check.type='button'; check.addEventListener('click',()=>{ const ok=picked.length===target.length&&picked.every((v,k)=>v===k); ans.className='answer '+(ok?'right':'wrong'); if(ok) ans.textContent=sentence; });
     const clear=el('button','btn small','지우기'); clear.type='button'; clear.addEventListener('click',()=>{ picked=[]; chips.querySelectorAll('button').forEach(b=>b.disabled=false); draw(); });
     const show=el('button','btn small','정답'); show.type='button'; show.addEventListener('click',()=>{ picked=target.map((w,i)=>i); chips.querySelectorAll('button').forEach(b=>b.disabled=true); ans.textContent=sentence; ans.className='answer right'; });
-    act.appendChild(check); act.appendChild(clear); act.appendChild(show); act.appendChild(playBtn('▶',[sentence],0.95));
+    act.appendChild(check); act.appendChild(clear); act.appendChild(show);
     wrapper.appendChild(ans); wrapper.appendChild(chips); wrapper.appendChild(act); box.appendChild(wrapper);
   });
-}
-function bodyListen(box,ids){
-  ids.forEach((id,li)=>{
-    const it=BY[id]; const lines=it.text.split(/\r?\n|\s\/\s/).map(s=>s.trim()).filter(Boolean);
-    const card=el('div','q'); const head=el('div','qhead'); head.appendChild(el('span','idtag',id)); head.appendChild(el('span','note',lines.length>1&&/^[A-Za-z .]{1,15}:/.test(lines[0])?'대화':'안내 · 강의')); head.appendChild(swapBtn('listen',li)); card.appendChild(head);
-    const row=el('div','s-act'); row.appendChild(playBtn('▶ 듣기',lines,0.95)); const slow=playBtn('천천히',lines,0.8); slow.className='btn small'; slow.textContent='천천히'; row.appendChild(slow); card.appendChild(row);
-    card.appendChild(el('p','qt en',it.a));
-    const opts=el('div','opts'); let answered=false;
-    const script=el('div','script',lines.join('\n')); script.hidden=true;
-    const choices=it.b.split('|').map(s=>s.trim()).filter(Boolean);
-    shuffle(choices).forEach(c=>{ const ok=c.startsWith('*'); const b=el('button','opt',c.replace(/^\*\s*/,'')); b.type='button'; b.addEventListener('click',()=>{ if(answered) return; answered=true; b.classList.add(ok?'right':'wrong'); if(!ok){ opts.querySelectorAll('.opt').forEach(o=>{ const txt=o.textContent; const orig=choices.find(x=>x.replace(/^\*\s*/,'')===txt); if(orig&&orig.startsWith('*')) o.classList.add('right'); }); } script.hidden=false; }); opts.appendChild(b); });
-    card.appendChild(opts);
-    const sb=el('button','btn small ghost','대본 보기'); sb.type='button'; sb.addEventListener('click',()=>{ script.hidden=!script.hidden; }); card.appendChild(sb);
-    card.appendChild(script); box.appendChild(card);
-  });
-  if(!ttsOK) box.appendChild(el('p','note','이 기기는 음성 재생이 안 돼요. 대본을 열고 소리 내어 읽은 뒤 답해요.'));
 }
 function bodyInterview(box,ids){
   ids.forEach((id,i)=>{
     const d=el('div','q'); const head=el('div','qhead'); head.appendChild(el('span','idtag',id)); head.appendChild(el('span','note','질문 '+(i+1))); head.appendChild(swapBtn('interview',i)); d.appendChild(head);
     d.appendChild(el('p','qt en',BY[id].text));
-    const row=el('div','s-act'); row.appendChild(playBtn('▶',[BY[id].text],0.95));
+    const row=el('div','s-act');
     const b=el('button','btn small','15초 준비 + 45초 말하기'); b.type='button'; b.addEventListener('click',()=>startTimer(1,'질문 '+(i+1)+' · 15초 생각, 45초 말하기')); row.appendChild(b); d.appendChild(row);
     box.appendChild(d);
   });
@@ -699,19 +666,30 @@ function bodyLecture(box){
   box.appendChild(linkRow([['TED-Ed (4~6분, 자막)','https://ed.ted.com/'],['ETS 무료 연습 문제','https://www.ets.org/toefl/test-takers/ibt/prepare.html']]));
   const b=el('button','btn small','60초 요약 말하기'); b.type='button'; b.addEventListener('click',()=>startTimer(1,'강의 요약 · 60초')); box.appendChild(b);
 }
-function bodyCtest(box,ids){
-  const it=BY[ids[0]]; if(!it){ box.appendChild(el('p','note','단어 완성 문단이 없어요.')); return; }
-  const head=el('div','qhead'); head.appendChild(el('span','idtag',it.id)); head.appendChild(swapBtn('ctest',0)); box.appendChild(head);
+function bodyCtest(box,ids,step){
+  const it=BY[ids[0]]; if(!it){ box.appendChild(el('p','note','빈칸 문단이 없어요. 시트의 문제 탭에 ctest 줄을 추가해요.')); return; }
+  const head=el('div','qhead'); head.appendChild(el('span','idtag',it.id)); head.appendChild(swapBtn('ctest',(step&&step.ci)||0)); box.appendChild(head);
   const d=el('div','ct'); const text=it.text; const firstEnd=text.indexOf('. ')+1;
   d.appendChild(document.createTextNode(text.slice(0,firstEnd)+' '));
   const rest=text.slice(firstEnd+1).split(' '); let count=0; const gaps=[];
+  const score=el('span','note','');
+  function check(){ let ok=0; gaps.forEach(g=>{ const v=g.inp.value.trim().toLowerCase(); const right=v===g.miss.toLowerCase(); g.wrap.classList.remove('right','wrong'); g.ans.textContent=''; if(right){ ok++; g.wrap.classList.add('right'); } else if(v){ g.wrap.classList.add('wrong'); g.ans.textContent=g.miss; } }); score.textContent=ok+' / '+gaps.length+' 맞음'+(ok<gaps.length?'. 빨간 칸 옆이 정답. 고쳐 쓰고 다시 확인.':'. 전부 맞았어요. 이제 소리 내어 한 번.'); }
   rest.forEach((tok,i)=>{ const m=tok.match(/^([A-Za-z]+)(.*)$/); count++;
-    if(m&&count%2===0&&m[1].length>=3){ const w=m[1], keep=Math.ceil(w.length/2); const g=el('span','gap',w.slice(0,keep)+'_'.repeat(w.length-keep)); g.tabIndex=0; g.setAttribute('role','button'); g.title='눌러서 확인';
-      const open=()=>{ g.textContent=w; g.classList.add('open'); }; g.addEventListener('click',open); g.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(); } }); gaps.push(open);
-      d.appendChild(g); d.appendChild(document.createTextNode(m[2]+(i<rest.length-1?' ':''))); }
+    if(m&&count%2===0&&m[1].length>=3){ const w=m[1], keep=Math.ceil(w.length/2), miss=w.slice(keep);
+      const wrap=el('span','gapw'); wrap.appendChild(el('span','pre',w.slice(0,keep)));
+      const inp=el('input','gapin'); inp.type='text'; inp.maxLength=miss.length+3; inp.autocapitalize='off'; inp.autocomplete='off'; inp.spellcheck=false; inp.setAttribute('aria-label','빈칸 '+(gaps.length+1)); inp.style.width=(miss.length*0.75+0.9)+'em';
+      const ans=el('span','gapans'); const g={inp,miss,wrap,ans}; gaps.push(g);
+      inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); const k=gaps.indexOf(g); if(k+1<gaps.length) gaps[k+1].inp.focus(); else check(); } });
+      wrap.appendChild(inp); wrap.appendChild(ans);
+      d.appendChild(wrap); d.appendChild(document.createTextNode(m[2]+(i<rest.length-1?' ':''))); }
     else d.appendChild(document.createTextNode(tok+(i<rest.length-1?' ':''))); });
   box.appendChild(d);
-  const row=el('div','s-act'); const all=el('button','btn small','모두 보기'); all.type='button'; all.addEventListener('click',()=>gaps.forEach(f=>f())); row.appendChild(all); row.appendChild(playBtn('▶ 전체 듣기',[text],0.95)); box.appendChild(row);
+  score.textContent=gaps.length+'칸. 앞 글자는 힌트, 뒷부분을 쳐 넣어요. Enter로 다음 칸.';
+  const row=el('div','s-act');
+  const cb=el('button','btn small primary','확인'); cb.type='button'; cb.addEventListener('click',check);
+  const show=el('button','btn small','정답 보기'); show.type='button'; show.addEventListener('click',()=>{ gaps.forEach(g=>{ g.inp.value=g.miss; }); check(); });
+  const clr=el('button','btn small ghost','지우기'); clr.type='button'; clr.addEventListener('click',()=>{ gaps.forEach(g=>{ g.inp.value=''; g.wrap.classList.remove('right','wrong'); g.ans.textContent=''; }); score.textContent=gaps.length+'칸. 앞 글자는 힌트, 뒷부분을 쳐 넣어요.'; });
+  row.appendChild(cb); row.appendChild(show); row.appendChild(clr); box.appendChild(row); box.appendChild(score);
 }
 function bodyReview(box){
   const keys=Object.keys(state.drafts).filter(k=>!k.startsWith(TK)&&(state.drafts[k]||'').trim()).sort();
@@ -723,7 +701,7 @@ function bodyReview(box){
 let mode=null;
 function logToday(){ if(!state.log[TK]) state.log[TK]={modes:{},finished:0}; return state.log[TK]; }
 function renderRun(){
-  stopSpeech(); ensureSets(false);
+  ensureSets(false);
   const list=stepsFor(mode); const log=state.log[TK]; const done=(log&&log.modes&&log.modes[mode])||[];
   $('runTotal').textContent='총 '+list.reduce((a,s)=>a+s.min,0)+'분';
   const ol=$('steps'); ol.textContent='';
@@ -731,7 +709,7 @@ function renderRun(){
     const li=el('li','step'+(done[i]?' done':''));
     const head=el('div','s-head'); head.appendChild(el('span','s-n',String(i+1))); head.appendChild(el('h3','s-title',s.title)); head.appendChild(el('span','s-min',s.min+'분')); li.appendChild(head);
     li.appendChild(el('p','s-how',s.how));
-    const body=el('div','s-body'); s.body(body,s.ids); li.appendChild(body);
+    const body=el('div','s-body'); s.body(body,s.ids,s); li.appendChild(body);
     const act=el('div','s-act');
     const start=el('button','btn primary','▶ '+s.min+'분'); start.type='button'; start.addEventListener('click',()=>startTimer(s.min,(i+1)+'단계 '+s.title)); act.appendChild(start);
     const dn=el('button','btn'+(done[i]?' good':''),done[i]?'✓ 했다':'했다'); dn.type='button';
