@@ -255,8 +255,8 @@ footer{color:var(--muted); font-size:.84rem; border-top:1px solid var(--line); p
   </section>
 
   <section class="road">
-    <h2>주간 숙제</h2>
-    <p class="note">시간표에 맞춘 고정 틀이에요. 아침 영어 블록은 보너스예요. 일어나면 5분, 못 일어나도 숙제는 그대로 남아요.</p>
+    <h2>주간 시간표</h2>
+    <p class="note">언제, 몇 분 하는지만 요일마다 정해 둔 거예요. 문제 내용은 매일 바뀌어요. 아침 영어 블록은 보너스예요. 일어나면 5분, 못 일어나도 숙제는 그대로 남아요.</p>
     <div class="tablewrap">
       <table class="week">
         <thead><tr><th>요일</th><th>언제</th><th>딱 이것만</th><th>흘려듣기 30분</th></tr></thead>
@@ -418,7 +418,22 @@ let WEEK=[
   {d:'토',mode:50,when:'작품 끝나는 3시',what:'50분 모드. 아침에 일어났다면 해커스 리스닝 인강 1강, 책은 이것만.',listen:'작품 하면서 배경으로'}
 ];
 const DOWI=today.getDay(); let RX=WEEK[DOWI];
-function renderHw(){ RX=WEEK[DOWI]; const h=$('hw'); h.textContent=''; const parts=RX.what.split('.'); h.appendChild(el('b',null,'오늘 숙제 · '+RX.d+'요일: '+RX.when+' '+parts[0].trim()+'.')); h.appendChild(el('span','sub',(parts.slice(1).join('.').trim()+' 흘려듣기 30분: '+RX.listen+'.').trim())); }
+function renderHw(){ RX=WEEK[DOWI]; const h=$('hw'); h.textContent=''; const parts=RX.what.split('.'); h.appendChild(el('b',null,'오늘 숙제 · '+RX.d+'요일: '+RX.when+' '+parts[0].trim()+'.')); h.appendChild(el('span','sub',(parts.slice(1).join('.').trim()+' 흘려듣기 30분: '+RX.listen+'.').trim())); const c=el('span','sub'); c.id='hwContent'; h.appendChild(c); }
+function idRange(ids){ if(!ids||!ids.length) return ''; return ids.length>2 ? ids[0]+'~'+ids[ids.length-1] : ids.join(', '); }
+function renderHwContent(list){
+  const c=$('hwContent'); if(!c) return; const sets=state.today.sets; const p=[];
+  list.forEach(s=>{
+    if(s.key==='repeat') p.push('따라 말하기 '+idRange(sets.repeat));
+    else if(s.key==='build') p.push('문장 조립 '+idRange(sets.build));
+    else if(s.key==='audio'){ const it=BY[(sets.audio||[])[0]]; if(it) p.push('실제 음원 '+it.text.split('(')[0].trim()); }
+    else if(s.key==='interview') p.push('인터뷰 '+idRange(sets.interview));
+    else if(s.key==='writing'){ const it=BY[(sets.writing||[])[0]]; if(it) p.push((it.type==='discussion'?'학술 토론 쓰기 ':'이메일 쓰기 ')+it.id); }
+    else if(s.key==='lecture') p.push('TED-Ed 강의 1개');
+    else if(s.key==='ctest') p.push('단어 완성 '+idRange(sets.ctest));
+    else if(s.key==='listen') p.push('기계 음성 듣기 '+idRange(sets.listen)+' (선택)');
+  });
+  c.textContent='오늘 내용: '+p.join(' · ')+'. 내일은 그다음 문제가 와요.';
+}
 function renderWeek(){ const tb=$('weekBody'); tb.textContent=''; WEEK.forEach((w,i)=>{ const tr=el('tr',i===DOWI?'now':''); tr.appendChild(el('td',null,w.d)); tr.appendChild(el('td',null,w.when)); tr.appendChild(el('td',null,w.what)); tr.appendChild(el('td',null,w.listen)); tb.appendChild(tr); }); }
 async function loadWeek(){
   try{
@@ -682,6 +697,7 @@ function renderRun(){
     act.appendChild(dn); li.appendChild(act); ol.appendChild(li);
   });
   $('finish').hidden=!(log&&log.finished&&log.finished>=mode);
+  renderHwContent(list);
 }
 function setMode(m,persist){ mode=m; if(persist){ state.mode=m; state.modeDate=TK; save(); } document.querySelectorAll('.mode').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.mode)===m))); renderRun(); }
 document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>setMode(Number(b.dataset.mode),true)));
