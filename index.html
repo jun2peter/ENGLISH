@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px;font-family:system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>오늘의 토플</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* Layout: one 640px column like a study timetable. Countdown strip, the single decision (today's condition), today's numbered run, coach hand-off, 14-day ledger, road to Dec 15 2027. */
+:root{
+  --bg:#F2F4F0; --surface:#FFFFFF; --fg:#1B1F26; --muted:#5B6470; --line:#D6DBD3;
+  --accent:#2B47C9; --accent-ink:#FFFFFF; --accent-soft:#E4E9FB;
+  --mark:#F5C400; --mark-ink:#1B1F26;
+  --good:#1E8A4F; --good-soft:#DDF3E6; --warn:#B9420E; --warn-soft:#FBE7DD;
+  --display:'Hahmlet','Noto Serif KR',Georgia,serif;
+  --body:'IBM Plex Sans KR','Noto Sans KR',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121519; --surface:#1B1F26; --fg:#E7EAEE; --muted:#98A2AE; --line:#2B323C;
+    --accent:#93A6FF; --accent-ink:#0F1530; --accent-soft:#24304F;
+    --mark:#F5C400; --mark-ink:#1B1F26;
+    --good:#5BCB86; --good-soft:#163523; --warn:#F39462; --warn-soft:#3B2318;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121519; --surface:#1B1F26; --fg:#E7EAEE; --muted:#98A2AE; --line:#2B323C;
+  --accent:#93A6FF; --accent-ink:#0F1530; --accent-soft:#24304F;
+  --mark:#F5C400; --mark-ink:#1B1F26;
+  --good:#5BCB86; --good-soft:#163523; --warn:#F39462; --warn-soft:#3B2318;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg); color:var(--fg); font-family:var(--body); font-size:15px; line-height:1.65; margin:0;
+  padding-block:0 110px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.wrap{max-width:640px; margin:0 auto; display:flex; flex-direction:column; gap:28px; padding-top:18px}
+h1,h2,h3{font-family:var(--display); font-weight:700; line-height:1.25; margin:0; text-wrap:balance}
+h1{font-size:2.1rem}
+h2{font-size:1.2rem}
+h3{font-size:1.02rem}
+p{margin:0}
+a{color:var(--accent)}
+button{font:inherit; color:inherit; cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,.gap:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.eyebrow{font-size:.74rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:600}
+
+/* strip */
+.strip{display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px; border-bottom:1px solid var(--line); padding-bottom:12px}
+.strip .today{font-weight:600; margin-right:auto}
+.chip{border:1px solid var(--line); background:var(--surface); border-radius:999px; padding:4px 12px; font-size:.86rem; display:inline-flex; gap:6px; align-items:center}
+.chip b{font-family:var(--mono); font-weight:500; font-variant-numeric:tabular-nums}
+.dates{flex-basis:100%; display:flex; flex-wrap:wrap; gap:8px 18px; font-size:.86rem; color:var(--muted)}
+.dates label{display:inline-flex; gap:8px; align-items:center}
+.dates input{font:inherit; border:1px solid var(--line); border-radius:6px; padding:3px 6px; background:var(--surface); color:var(--fg)}
+
+/* hero */
+.hero{display:flex; flex-direction:column; gap:10px}
+.lede{color:var(--muted); font-size:1.02rem}
+.back{background:var(--mark); color:var(--mark-ink); padding:10px 14px; border-radius:6px; font-weight:500}
+
+/* modes */
+.modes{display:grid; grid-template-columns:repeat(3,1fr); gap:8px}
+@media (max-width:560px){.modes{grid-template-columns:1fr}}
+.mode{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:12px 14px; text-align:left; display:flex; flex-direction:column; gap:2px; min-width:0}
+.mode[aria-pressed="true"]{border-color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent); background:var(--accent-soft)}
+.m-name{font-weight:600}
+.m-time{font-family:var(--mono); font-size:1.3rem; color:var(--accent); font-variant-numeric:tabular-nums}
+.m-desc{font-size:.84rem; color:var(--muted)}
+
+/* run */
+.run{display:flex; flex-direction:column; gap:12px}
+.run-head{display:flex; flex-wrap:wrap; gap:4px 14px; align-items:baseline}
+.run-head strong{font-family:var(--mono); font-weight:500}
+.run-hint{color:var(--muted); font-size:.88rem}
+.steps{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px}
+.step{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:14px 16px; display:flex; flex-direction:column; gap:10px; min-width:0}
+.step.done{opacity:.62}
+.step.done .s-title{text-decoration:line-through}
+.s-head{display:flex; align-items:baseline; gap:10px}
+.s-n{font-family:var(--display); font-weight:700; font-size:1.3rem; color:var(--accent); min-width:1.2em}
+.s-min{margin-left:auto; font-family:var(--mono); font-size:.9rem; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap}
+.s-how{color:var(--muted); font-size:.92rem}
+.s-body{display:flex; flex-direction:column; gap:8px; min-width:0}
+.s-act{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+.btn{border:1px solid var(--line); background:var(--surface); border-radius:6px; padding:7px 12px; font-size:.92rem; font-weight:500}
+.btn.primary{background:var(--accent); color:var(--accent-ink); border-color:var(--accent)}
+.btn.good{background:var(--good-soft); color:var(--good); border-color:transparent}
+.btn.small{padding:4px 9px; font-size:.84rem}
+.btn:disabled{opacity:.5; cursor:default}
+.finish{background:var(--good-soft); color:var(--good); padding:12px 16px; border-radius:8px; font-weight:600}
+
+/* materials */
+.lines{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px}
+.lines li{display:flex; gap:10px; align-items:flex-start}
+.lines .play{flex:none; width:34px; height:34px; border-radius:50%; border:1px solid var(--line); background:var(--surface); display:inline-flex; align-items:center; justify-content:center; font-size:.8rem}
+.lines .play.on{background:var(--accent); color:var(--accent-ink); border-color:var(--accent)}
+.en{font-size:1.02rem; line-height:1.5}
+.note{font-size:.84rem; color:var(--muted)}
+.links{display:flex; flex-wrap:wrap; gap:6px}
+.links a{border:1px solid var(--line); border-radius:999px; padding:3px 11px; font-size:.86rem; text-decoration:none; background:var(--surface)}
+.howlist{margin:0; padding-left:1.2em; font-size:.92rem; display:flex; flex-direction:column; gap:2px}
+.q{display:flex; flex-direction:column; gap:6px; padding:10px 12px; border:1px solid var(--line); border-radius:6px}
+.q .qt{font-weight:500}
+.prompt{border:1px solid var(--line); border-radius:6px; padding:10px 12px; display:flex; flex-direction:column; gap:6px; font-size:.95rem}
+.prompt .who{font-weight:600}
+textarea{width:100%; min-height:150px; font:inherit; font-size:1rem; line-height:1.55; padding:10px 12px; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--fg); resize:vertical}
+textarea.short{min-height:70px}
+.wc{display:flex; justify-content:space-between; font-size:.84rem; color:var(--muted); font-variant-numeric:tabular-nums}
+.wc.ok{color:var(--good)}
+.chips{display:flex; flex-wrap:wrap; gap:6px}
+.chipw{border:1px solid var(--line); background:var(--surface); border-radius:6px; padding:4px 10px; font-size:.98rem}
+.chipw:disabled{opacity:.3}
+.answer{min-height:38px; border-bottom:2px solid var(--line); padding:6px 2px; font-size:1.02rem; line-height:1.5}
+.answer.right{border-color:var(--good); color:var(--good)}
+.answer.wrong{border-color:var(--warn)}
+.ct{font-size:1.02rem; line-height:1.8}
+.gap{font-family:var(--mono); background:var(--accent-soft); border-radius:4px; padding:0 4px; cursor:pointer; letter-spacing:.02em}
+.gap.open{background:var(--good-soft); color:var(--good)}
+.yday{border-left:3px solid var(--line); padding:4px 12px; color:var(--muted); font-size:.92rem; white-space:pre-wrap}
+
+/* coach */
+.coach{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:16px; display:flex; flex-direction:column; gap:10px}
+.btns{display:flex; flex-wrap:wrap; gap:8px}
+.toast{background:var(--fg); color:var(--bg); padding:8px 12px; border-radius:6px; font-size:.9rem}
+.fallback{display:flex; flex-direction:column; gap:6px}
+
+/* ledger */
+.ledger{display:flex; flex-direction:column; gap:10px}
+.cells{display:grid; grid-template-columns:repeat(7,1fr); gap:6px; max-width:420px}
+.cell{aspect-ratio:1; max-width:100%; border:1px solid var(--line); border-radius:6px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:.74rem; color:var(--muted); font-variant-numeric:tabular-nums; gap:1px}
+.cell b{font-family:var(--mono); font-weight:500; font-size:.9rem; color:var(--fg)}
+.cell.full{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+.cell.full b{color:var(--accent-ink)}
+.cell.part{border-color:var(--accent); border-style:dashed}
+.cell.today{box-shadow:0 0 0 2px var(--mark)}
+
+/* road */
+.road{display:flex; flex-direction:column; gap:10px}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse; width:100%; font-size:.9rem}
+th,td{text-align:left; vertical-align:top; padding:8px 10px 8px 0; border-bottom:1px solid var(--line)}
+th{font-weight:600; color:var(--muted); font-size:.8rem; letter-spacing:.04em}
+td.when{white-space:nowrap; font-family:var(--mono); font-size:.84rem; font-variant-numeric:tabular-nums}
+tr.now td{background:var(--accent-soft)}
+tr.now td:first-child{border-radius:6px 0 0 6px; padding-left:8px}
+tr.now td:last-child{border-radius:0 6px 6px 0}
+
+/* facts */
+.facts{display:flex; flex-direction:column; gap:8px}
+.facts ul{margin:0; padding-left:1.2em; display:flex; flex-direction:column; gap:6px; font-size:.92rem}
+footer{color:var(--muted); font-size:.84rem; border-top:1px solid var(--line); padding-top:12px}
+
+/* timer bar */
+.timerbar{position:fixed; left:0; right:0; bottom:0; background:var(--surface); border-top:1px solid var(--line);
+  padding-top:10px; padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px))}
+.timerbar .in{max-width:640px; margin:0 auto; display:flex; align-items:center; gap:12px}
+.t-label{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:500}
+.t-time{font-family:var(--mono); font-size:1.6rem; font-variant-numeric:tabular-nums; color:var(--accent)}
+.t-time.over{color:var(--good)}
+@media (prefers-reduced-motion:no-preference){.gap,.btn,.mode{transition:background-color .15s,border-color .15s}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="strip">
+    <div class="today" id="todayLabel">오늘</div>
+    <button class="chip" id="chipTest" type="button" title="날짜 바꾸기">첫 토플 <b id="dTest">D-</b></button>
+    <button class="chip" id="chipApp" type="button" title="날짜 바꾸기">지원 마감 <b id="dApp">D-</b></button>
+    <div class="dates" id="dates" hidden>
+      <label>첫 토플 날짜 <input type="date" id="testDate"></label>
+      <label>MIT 접수 마감 <input type="date" id="appDate"></label>
+    </div>
+  </header>
+
+  <section class="hero">
+    <span class="eyebrow">MIT Media Lab · 2027</span>
+    <h1>오늘은 이것만.</h1>
+    <p class="lede">순서는 정해져 있어요. 고를 건 오늘 컨디션 하나뿐이에요.</p>
+    <p class="back" id="back" hidden></p>
+  </section>
+
+  <section class="modes" aria-label="오늘 컨디션">
+    <button class="mode" type="button" data-mode="5" aria-pressed="false">
+      <span class="m-name">무너진 날</span><span class="m-time">5분</span>
+      <span class="m-desc">이 페이지 안에서만. 아무것도 안 열어도 돼요.</span>
+    </button>
+    <button class="mode" type="button" data-mode="25" aria-pressed="false">
+      <span class="m-name">보통</span><span class="m-time">25분</span>
+      <span class="m-desc">듣기·말하기·쓰기 한 바퀴.</span>
+    </button>
+    <button class="mode" type="button" data-mode="50" aria-pressed="false">
+      <span class="m-name">좋은 날</span><span class="m-time">50분</span>
+      <span class="m-desc">한 바퀴에 긴 강의와 읽기까지.</span>
+    </button>
+  </section>
+
+  <section class="run">
+    <div class="run-head"><strong id="runTotal">총 25분</strong><span class="run-hint">▶를 누르면 타이머가 돌아요. 끝낸 단계는 ✓.</span></div>
+    <ol class="steps" id="steps"></ol>
+    <p class="finish" id="finish" hidden>오늘 몫 끝. 내일 또 열면 돼요.</p>
+  </section>
+
+  <section class="coach">
+    <h2>코치에게 보내기</h2>
+    <p>쓰기 답이나 말하기 메모를 복사해서 클로드 창에 붙여 넣으면, 새 토플 기준(1~6 밴드)으로 채점하고 고쳐 줘요.</p>
+    <div class="btns">
+      <button class="btn primary" id="copyWrite" type="button">쓰기 채점 요청 복사</button>
+      <button class="btn" id="copySpeak" type="button">말하기 피드백 요청 복사</button>
+    </div>
+    <p class="note">어느 클로드에 붙여 넣어도 돼요. 과제와 요청이 글 안에 다 들어 있어요.</p>
+    <p>기록을 구글 시트에 모으면, 시트 링크만 주고 "피드백 칸 채워줘"라고 하면 돼요. 하루 한 번 아래 버튼으로 복사해서 시트 맨 아래 줄에 붙여 넣어요.</p>
+    <div class="btns">
+      <button class="btn" id="copySheet" type="button">시트에 붙여넣을 오늘 줄 복사</button>
+    </div>
+    <p class="toast" id="toast" hidden></p>
+    <div class="fallback" id="fallback" hidden>
+      <span class="note">복사가 막힌 기기예요. 아래 글을 직접 선택해서 복사하세요.</span>
+      <textarea id="fallbackText" class="short" readonly></textarea>
+    </div>
+  </section>
+
+  <section class="ledger">
+    <h2>지난 14일</h2>
+    <div class="cells" id="cells"></div>
+    <p class="note" id="ledgerNote"></p>
+  </section>
+
+  <section class="road">
+    <h2>2027년 12월 15일까지의 길</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>기간</th><th>할 일</th><th>규칙 하나</th></tr></thead>
+        <tbody id="roadBody">
+          <tr data-from="2026-10-16" data-to="2026-12-31"><td class="when">지금 ~ 12/31</td><td>기초 다지기. 이 페이지를 매일 한 번 연다. 듣고 따라 말하기, 섀도잉, 짧은 쓰기.</td><td>모드는 아무거나. 여는 게 전부.</td></tr>
+          <tr data-from="2027-01-01" data-to="2027-02-28"><td class="when">2027 1/1 ~ 2/28</td><td>형식 익히기. ETS 무료 샘플 테스트로 새 유형을 보고, 토요일은 50분 모드로 섹션 하나를 시간 재고 푼다.</td><td>틀린 유형만 메모한다.</td></tr>
+          <tr data-from="2027-03-01" data-to="2027-03-31"><td class="when">2027 3월</td><td>첫 시험. 모의 2회 뒤 응시. 점수는 기준선이지 판결이 아니다.</td><td>결과가 나오면 다음 시험 날짜만 잡는다.</td></tr>
+          <tr data-from="2027-04-01" data-to="2027-08-31"><td class="when">2027 4월 ~ 8월</td><td>약한 섹션만 집중, 여름에 2차 시험. 포트폴리오 정리 시작. 이미 만든 작품(ARMS, 인간은 꽃, 뮤비)이 재료다.</td><td>포폴은 새로 만들지 않고 고른다.</td></tr>
+          <tr data-from="2027-09-15" data-to="2027-12-15"><td class="when">2027 9/15 ~ 12/15</td><td>지원. 교수·연구그룹 최대 3개 지정, 목적서, 개인진술, 포트폴리오(URL 또는 PDF), 추천서 3통.</td><td>영어 점수는 2년 안의 것만 유효.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="facts">
+    <h2>확인한 사실</h2>
+    <ul>
+      <li>토플은 2026년 1월부터 새 형식이에요. 읽기 50문항 30분, 듣기 47문항 29분, 쓰기 12문항 23분, 말하기 11문항 8분, 전체 약 2시간. 섹션마다 1~6 밴드로 채점하고, 2028년 1월까지는 0~120 환산 점수도 함께 나와요. (<a href="https://www.ets.org/toefl/test-takers/ibt/about/content.html">ETS 시험 구성</a>)</li>
+      <li>새 문제 유형: 단어 완성(Complete the Words), 듣고 따라 말하기(Listen and Repeat), 인터뷰, 문장 조립(Build a Sentence), 이메일 쓰기, 학술 토론 쓰기. 이 페이지의 과제가 그 유형들이에요. 예전 형식 교재는 기초 재료로만 쓰세요.</li>
+      <li>MIT 미디어랩(MAS): TOEFL iBT 100 또는 IELTS 7 최소, 면제 없음, 2년 이내 점수. GRE 불필요. 2026년 접수는 9/15~12/15였고 2027년도 같은 패턴일 가능성이 커요. 1~6 밴드 환산 기준은 아직 명시되지 않았으니 지원 전에 다시 확인. (<a href="https://www.media.mit.edu/graduate-program/apply/">지원 안내</a> · <a href="https://www.media.mit.edu/posts/ielts-requirement-for-international-students/">영어 요건</a> · <a href="https://oge.mit.edu/programs/media-arts-and-sciences/">MIT 대학원 MAS</a>)</li>
+      <li>포트폴리오는 전자 제출만, URL 또는 PDF. 그룹에 맞게 골라서 설명을 붙이는 게 핵심이에요. (<a href="https://www.media.mit.edu/posts/academics-portfolio-requirements/">포트폴리오 요건</a>)</li>
+    </ul>
+  </section>
+
+  <footer>기록은 이 기기의 브라우저에만 남아요. 휴대폰과 PC는 따로 세요.</footer>
+</div>
+
+<div class="timerbar" id="timerbar" hidden>
+  <div class="in">
+    <span class="t-label" id="tLabel"></span>
+    <span class="t-time" id="tTime">00:00</span>
+    <button class="btn small" id="tStop" type="button">정지</button>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- banks ---------- */
+const SENT = [
+"The library closes early on Fridays during the summer.",
+"I usually take the bus because parking is expensive.",
+"Could you send me the notes from yesterday's lecture?",
+"The museum offers free admission on the first Sunday.",
+"We should finish the project before the holiday starts.",
+"My roommate forgot to return the books on time.",
+"The professor moved the deadline to next Wednesday.",
+"Most students prefer studying in small groups.",
+"The cafeteria stopped serving breakfast after ten.",
+"She asked whether the class had been cancelled.",
+"If the weather improves, the field trip will go ahead as planned.",
+"The study found that people remember images better than words.",
+"Many cities are replacing old buses with electric ones to cut pollution.",
+"Although the experiment failed, the team learned something useful.",
+"Researchers believe that sleep helps the brain organize new memories.",
+"The new schedule gives students more time between classes.",
+"Before the meeting, please review the budget summary I sent you.",
+"He decided to major in biology after volunteering at a clinic.",
+"The company plans to open three more stores by the end of the year.",
+"Our assignment is to compare two theories of how children learn language.",
+"Even though the apartment is small, its location makes it worth the rent.",
+"The lecture explained why some birds migrate thousands of miles every autumn.",
+"Scientists have discovered that certain plants can communicate through their roots.",
+"The student center will be closed for renovations until the beginning of March.",
+"In many traditional societies, stories were passed down orally for generations.",
+"The committee recommended that the university invest in better recording equipment.",
+"Because the data were incomplete, the researchers could not draw a firm conclusion.",
+"Public transportation becomes more efficient when more people choose to use it.",
+"The professor pointed out that early printing presses changed how people shared ideas.",
+"If you register before the deadline, you can still change your course selection later.",
+"One reason the Roman road network lasted so long was the careful layering of stone and gravel.",
+"The speaker argued that creativity depends less on talent than on the habit of daily practice.",
+"Unlike earlier models, the new telescope can detect faint light from extremely distant galaxies.",
+"Students who explain a concept to someone else tend to understand it more deeply themselves.",
+"The city council postponed the vote because several members wanted more time to review the plan.",
+"Although coral reefs cover a tiny fraction of the ocean, they support a quarter of all marine species.",
+"The documentary suggests that urban farming could supply a surprising share of a city's vegetables.",
+"Before the invention of refrigeration, people preserved food by salting, drying, or smoking it.",
+"The researcher cautioned that a correlation between two variables does not prove that one causes the other.",
+"After reviewing the feedback, the design team simplified the interface and removed two unnecessary steps."
+];
+
+const QS = [
+"Describe a typical weekday for you. What part of the day do you enjoy most?",
+"What is a skill you learned recently? How did you learn it?",
+"Do you prefer working early in the morning or late at night? Why?",
+"Tell me about a project you are proud of. What made it difficult?",
+"Some people plan every detail of a trip. Others decide as they go. Which do you prefer, and why?",
+"What kind of music do you listen to while you work? Does it help?",
+"Describe a place in your city that visitors should see. What makes it special?",
+"Do you think students should be required to take art classes? Why or why not?",
+"What is one thing you would change about your daily routine?",
+"Tell me about a teacher or mentor who influenced you. What did you learn from them?",
+"Would you rather live in a big city or a small town? Give two reasons.",
+"Describe a time when you had to learn something quickly. What did you do?",
+"Do you prefer to watch films at home or in a theater? Why?",
+"What is a tool or app you use every day? How does it help you?",
+"Some people think handwriting is no longer important. Do you agree?",
+"Describe a hobby you would like to try. Why does it interest you?",
+"Is it better to work on one project at a time or several at once? Why?",
+"What do you usually do when you feel stressed? Does it work?",
+"Describe a meal you could cook for a friend. How do you make it?",
+"Should cities spend more money on parks or on public transportation? Why?",
+"Tell me about a book, film, or animation that changed how you think.",
+"Do you prefer to receive feedback in person or in writing? Why?",
+"What is the most useful thing you learned in school? Why was it useful?",
+"Describe something you made with your hands. What was the process like?",
+"Some people say that failure teaches more than success. What do you think?",
+"How do you decide what to do first when you have many tasks?",
+"Would you rather have more free time or more money? Why?",
+"Describe a time you helped someone solve a problem.",
+"Do you think everyone should learn to code? Why or why not?",
+"What is one goal you have for next year, and what is your first step?"
+];
+
+const AD = [
+{prof:"This week we discussed how technology changes the way people learn. Some educators believe online courses can replace traditional classrooms; others say in-person classes are irreplaceable. In your opinion, can online learning fully replace the classroom? Why or why not?",
+ a:["Maria","I think online learning can replace classrooms for most subjects. You can pause, rewind, and learn at your own pace, which a lecture hall never allows."],
+ b:["Daniel","I disagree. The discussions and friendships that happen in a physical classroom are part of learning, and a video can't give you that."]},
+{prof:"Cities around the world are debating whether to ban cars from their centers. Supporters say it reduces pollution and makes streets safer; critics say it hurts businesses and makes life harder for people who rely on cars. Should city centers be car-free? Explain your position.",
+ a:["Tomas","Yes. In my hometown, the car-free zone became the most popular area for shopping and eating. Businesses did better, not worse."],
+ b:["Aisha","I'm not convinced. Elderly people and families with small children often need a car, and public transport isn't good enough everywhere."]},
+{prof:"Many companies now allow employees to work from home. Some researchers argue remote work improves productivity and well-being; others worry it weakens teamwork and creativity. Do the benefits of remote work outweigh the drawbacks?",
+ a:["Kenji","The benefits win. No commute means more sleep and more focused time, and most meetings work fine online."],
+ b:["Sofia","I think creativity suffers. The best ideas at my internship came from unplanned conversations in the hallway."]},
+{prof:"Governments spend large sums on space exploration. Some say this money should go to problems on Earth, such as poverty and climate change. Others say space research produces technology and knowledge that benefit everyone. Which view do you support?",
+ a:["Liam","Earth first. We have enough urgent problems, and the budgets for space missions are enormous."],
+ b:["Priya","Space research gave us weather satellites and GPS. Cutting it would cost us more in the long run."]},
+{prof:"Some people believe that art and music should be a required part of every school curriculum. Others think schools should focus on subjects like math and science that lead more directly to jobs. What is your view?",
+ a:["Noah","Required art classes are a waste for students who have no interest. Let them choose."],
+ b:["Hana","Art teaches creativity and patience, which every job needs. It should be as required as math."]},
+{prof:"Social media platforms are often blamed for spreading misinformation. Some argue platforms should be legally responsible for false content posted by users; others say that would threaten free expression. Should platforms be held responsible?",
+ a:["Elena","Yes. They profit from the content, so they should be responsible for it, just like a newspaper."],
+ b:["Marcus","No. Deciding what is 'false' is hard, and companies would simply delete anything controversial to stay safe."]},
+{prof:"Many universities are considering making all first-year courses pass/fail instead of letter grades. Supporters say it reduces stress and encourages exploration; critics say it lowers motivation. Would you support pass/fail grading for first-year students?",
+ a:["Yuki","I would. In my first year I avoided interesting courses because I was afraid of a bad grade."],
+ b:["Omar","Grades motivated me to work harder. Without them, I think many students would do the minimum."]},
+{prof:"As AI tools become common, some argue that students should be allowed to use them freely for assignments, since they will use them at work anyway. Others say this prevents students from developing basic skills. What rules, if any, should schools set for AI use?",
+ a:["Chloe","Allow it freely. Banning calculators didn't make sense either; the job is to learn to use the tool well."],
+ b:["Ravi","There should be limits. If AI writes your first essay, you never learn how to structure an argument yourself."]},
+{prof:"Tourism brings money to many regions but can also damage local culture and the environment. Some places now limit the number of visitors. Is limiting tourism a good idea?",
+ a:["Isabel","Limits are necessary. Venice and Kyoto are overwhelmed, and residents are leaving."],
+ b:["Jonas","Limits hurt the people who depend on tourists. A better answer is managing visitors, not turning them away."]},
+{prof:"Some researchers argue that people today have shorter attention spans because of smartphones. Others say attention has simply shifted to different kinds of tasks. Do you think technology is making it harder for people to concentrate?",
+ a:["Mei","Definitely. I can't read ten pages without checking my phone, and I didn't use to be like this."],
+ b:["Lucas","I don't think so. People concentrate for hours on games and videos. We just concentrate on different things."]}
+];
+
+const EMAIL = [
+{to:"Professor Kim", sit:"You missed Monday's lecture because you were sick.", pts:["explain why you missed it","ask what topics were covered","ask whether you can get the slides"]},
+{to:"your friend Jisoo", sit:"You borrowed a camera from a friend and accidentally scratched the lens.", pts:["apologize","explain what happened","offer a solution"]},
+{to:"the organizer of the university film club", sit:"You want to join the club.", pts:["introduce yourself","say why you want to join","ask about the next meeting"]},
+{to:"the building manager", sit:"The heating in your apartment stopped working two days ago.", pts:["describe the problem","say when it started","ask for a repair time"]},
+{to:"customer service", sit:"You ordered headphones online but received the wrong color.", pts:["explain the mistake","give your order details","say what you want them to do"]},
+{to:"your friend Alex", sit:"Alex invited you on a weekend trip, but you cannot go.", pts:["thank them","explain why you can't go","suggest another time"]},
+{to:"your classmates", sit:"You are organizing a study group before the final exam.", pts:["propose a day and place","say what you will cover","ask them to reply by a date"]},
+{to:"your former teacher, Ms. Park", sit:"You need a recommendation letter for a graduate program.", pts:["remind her who you are","explain what the letter is for","mention the deadline"]}
+];
+
+const BUILD = [
+"The professor asked us to submit the essay by Friday.",
+"I would rather study in the library than at home.",
+"Most of the students had already left when the alarm rang.",
+"She has been learning Korean since she moved to Seoul.",
+"If it rains tomorrow, the concert will be moved indoors.",
+"The new museum is much bigger than the old one.",
+"He forgot to bring his laptop to the meeting.",
+"We need to decide which topic to present next week.",
+"The results of the survey surprised the research team.",
+"It took me three hours to finish the reading assignment.",
+"Could you tell me where the registration office is?",
+"The company has been hiring more engineers this year.",
+"Nothing is more important than getting enough sleep before an exam.",
+"Students who ask questions usually understand the material better.",
+"My sister is going to visit me during the spring break.",
+"The lecture was so interesting that nobody wanted to leave."
+];
+const PROPER = new Set(["I","Friday","Korean","Seoul"]);
+
+const CT = [
+"Honeybees communicate the location of food through a pattern of movements known as the waggle dance. When a forager returns to the hive, she moves in a figure-eight path on the honeycomb. The angle of the dance shows the direction of the flowers relative to the sun, and the length of the run indicates the distance. Other bees follow the dancer closely and then fly out to find the same food source.",
+"The printing press, developed in Europe in the fifteenth century, changed how information spread. Before it existed, books were copied by hand, which made them rare and expensive. Printed books could be produced quickly and in large numbers, so more people learned to read. Scholars could compare identical copies of a text, which made scientific discussion easier.",
+"Urban heat islands are areas of a city that are noticeably warmer than the surrounding countryside. Buildings and roads absorb sunlight during the day and release the heat slowly at night. Trees and parks have the opposite effect because plants cool the air through evaporation. Many cities now plant trees and paint roofs white to reduce the problem.",
+"Sleep plays an important role in forming long-term memories. During deep sleep, the brain replays patterns of activity from the day. This process strengthens the connections between neurons that were used while learning. Students who sleep well after studying usually remember more than those who stay up late to review.",
+"The Silk Road was not a single road but a network of trade routes connecting China with the Mediterranean. Merchants rarely traveled the whole distance; instead, goods passed from one trader to another. Along with silk and spices, ideas and religions also moved across the continent. Several cities grew wealthy by serving as stops along the way.",
+"Coral reefs are built by tiny animals called polyps, which produce hard skeletons of calcium carbonate. Over thousands of years, these skeletons accumulate into enormous structures. Reefs provide shelter for a huge variety of fish and other sea creatures. When ocean water becomes too warm, corals expel the algae that give them color and food, a process called bleaching.",
+"Early photography required long exposure times, so subjects had to stay still for several minutes. Portrait studios used clamps to hold a person's head in place. As chemical processes improved, exposure times dropped to a fraction of a second. This change made it possible to photograph moving subjects for the first time.",
+"Many animals use camouflage to avoid predators or to surprise their prey. Some insects resemble leaves or twigs so closely that birds pass them by. Certain fish can change their color to match the sea floor within seconds. Camouflage works because predators rely on vision to find food, and anything that breaks the expected pattern is hard to notice."
+];
+
+/* ---------- date & state ---------- */
+const pad = n => String(n).padStart(2,'0');
+const keyOf = d => d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parseKey = k => { const p=k.split('-').map(Number); return new Date(p[0],p[1]-1,p[2]); };
+const today = new Date(); today.setHours(0,0,0,0);
+const TK = keyOf(today);
+const START = new Date(2026,9,16);
+const dayIndex = Math.max(0, Math.round((today-START)/86400000));
+const DOW = ['일','월','화','수','목','금','토'];
+
+const KEY='toefl-today:v1';
+let state = {log:{}, drafts:{}, memo:{}, testDate:'2027-03-13', appDate:'2027-12-15', mode:null};
+try{ const raw=localStorage.getItem(KEY); if(raw){ state=Object.assign(state, JSON.parse(raw)); } }catch(e){}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+
+function rng(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function pick(bank,n,offset){ const out=[]; for(let i=0;i<n;i++) out.push(bank[(offset+i)%bank.length]); return out; }
+function shuffled(arr,seed){ const r=rng(seed); const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(r()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function words(t){ return t.trim().split(/\s+/).filter(Boolean).length; }
+function el(tag,cls,text){ const e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
+const $ = id => document.getElementById(id);
+
+/* ---------- today's material ---------- */
+const sentences = pick(SENT, 5, (dayIndex*5)%SENT.length);
+const questions = pick(QS, 2, (dayIndex*2)%QS.length);
+const builds = pick(BUILD, 3, (dayIndex*3)%BUILD.length);
+const ctext = CT[dayIndex%CT.length];
+const isAD = dayIndex%2===0;
+const adPrompt = AD[Math.floor(dayIndex/2)%AD.length];
+const emPrompt = EMAIL[Math.floor(dayIndex/2)%EMAIL.length];
+const draftKey = TK+':'+(isAD?'ad':'em');
+
+/* ---------- header ---------- */
+$('todayLabel').textContent = today.getFullYear()+'년 '+(today.getMonth()+1)+'월 '+today.getDate()+'일 '+DOW[today.getDay()]+'요일' + (today.getDay()===0 ? ' · 일요일은 5분이면 충분해요' : '');
+function dday(k){ const n=Math.round((parseKey(k)-today)/86400000); return n>0?'D-'+n:(n===0?'D-Day':'D+'+(-n)); }
+function renderCounts(){ $('dTest').textContent=dday(state.testDate); $('dApp').textContent=dday(state.appDate); }
+$('testDate').value=state.testDate; $('appDate').value=state.appDate;
+renderCounts();
+function toggleDates(){ $('dates').hidden=!$('dates').hidden; }
+$('chipTest').addEventListener('click',toggleDates); $('chipApp').addEventListener('click',toggleDates);
+$('testDate').addEventListener('change',e=>{ if(e.target.value){ state.testDate=e.target.value; save(); renderCounts(); } });
+$('appDate').addEventListener('change',e=>{ if(e.target.value){ state.appDate=e.target.value; save(); renderCounts(); } });
+
+/* ---------- returning notice ---------- */
+const pastKeys = Object.keys(state.log).filter(k=>k<TK).sort();
+const lastKey = pastKeys.length ? pastKeys[pastKeys.length-1] : null;
+const gap = lastKey ? Math.round((today-parseKey(lastKey))/86400000) : 0;
+if(gap>=2 && !state.log[TK]){
+  $('back').textContent = gap+'일 만이에요. 괜찮아요. 오늘은 5분 모드부터예요.';
+  $('back').hidden=false;
+}
+
+/* ---------- steps per mode ---------- */
+function stepsFor(mode){
+  const s=[];
+  s.push({id:'repeat', title:'듣고 따라 말하기', min: mode===5?2:3, how:'▶를 누르면 문장이 들려요. 끝나자마자 같은 속도로 따라 말해요. 문장마다 2번씩.', body:bodyRepeat});
+  if(mode===5){
+    s.push({id:'build', title:'문장 조립', min:3, how:'단어를 눌러 순서대로 문장을 만들어요. 틀려도 정답 보고 한 번 소리 내어 읽으면 끝.', body:bodyBuild});
+    return s;
+  }
+  s.push({id:'shadow', title:'섀도잉', min:8, how:'1~2분짜리 영상 하나. 자막 없이 1번, 자막 보며 1번, 자막 보며 동시에 따라 말하기 3번. 마지막은 휴대폰 음성메모로 녹음해서 들어봐요.', body:bodyShadow});
+  s.push({id:'interview', title:'인터뷰 답하기', min:5, how:'질문마다 15초 생각하고 45초 말해요. 멈추지 않는 게 목표이지, 맞는 문법이 목표가 아니에요.', body:bodyInterview});
+  s.push({id:'write', title: isAD?'학술 토론 쓰기':'이메일 쓰기', min: isAD?10:7, how: isAD?'교수 질문에 내 의견을 써요. 100단어 이상, 이유 하나에 예 하나, 두 학생 중 한 명과 다른 점 한 줄.':'80단어 이상. 인사, 용건, 세 가지 포인트, 마무리 인사 순서로.', body:bodyWrite});
+  if(mode===50){
+    s.push({id:'lecture', title:'긴 강의 듣고 요약', min:10, how:'TED-Ed 4~6분 영상 하나. 들으면서 키워드만 적고, 다 듣고 60초 동안 영어로 요약해 말해요.', body:bodyLecture});
+    s.push({id:'ctest', title:'단어 완성 읽기', min:5, how:'반쯤 지워진 단어를 소리 내어 채우며 읽어요. 막히면 단어를 눌러 확인.', body:bodyCtest});
+    s.push({id:'review', title:'복습과 제출', min:5, how:'어제 쓴 글을 소리 내어 읽고, 오늘 글은 아래 "코치에게 보내기"로 보내요.', body:bodyReview});
+  }
+  return s;
+}
+
+/* ---------- bodies ---------- */
+let ttsOK = ('speechSynthesis' in window) && ('SpeechSynthesisUtterance' in window);
+let voice=null;
+function pickVoice(){ try{ const vs=speechSynthesis.getVoices(); if(!vs.length) return; const en=vs.filter(v=>/^en/i.test(v.lang)); voice = en.find(v=>/en[-_]US/i.test(v.lang) && /natural|google|samantha|aria|jenny/i.test(v.name)) || en.find(v=>/en[-_]US/i.test(v.lang)) || en[0] || null; }catch(e){} }
+if(ttsOK){ pickVoice(); try{ speechSynthesis.onvoiceschanged=pickVoice; }catch(e){} }
+let currentPlay=null;
+function speak(text,btn){
+  if(!ttsOK) return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text); u.lang='en-US'; u.rate=0.92; if(voice) u.voice=voice;
+    if(currentPlay) currentPlay.classList.remove('on');
+    currentPlay=btn; btn.classList.add('on');
+    u.onend=u.onerror=()=>{ btn.classList.remove('on'); if(currentPlay===btn) currentPlay=null; };
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+function bodyRepeat(box){
+  const ul=el('ul','lines');
+  sentences.forEach((s,i)=>{
+    const li=el('li');
+    const b=el('button','play','▶'); b.type='button'; b.setAttribute('aria-label','문장 '+(i+1)+' 듣기');
+    if(ttsOK) b.addEventListener('click',()=>speak(s,b)); else b.disabled=true;
+    li.appendChild(b); li.appendChild(el('span','en',s)); ul.appendChild(li);
+  });
+  box.appendChild(ul);
+  box.appendChild(el('p','note', ttsOK ? '소리가 안 나면 기기 음량과 무음 스위치를 확인해요. 들은 뒤 1초 안에 시작하는 게 요령.' : '이 기기는 음성 재생이 안 돼요. 문장을 소리 내어 두 번씩 읽어요.'));
+}
+function bodyBuild(box){
+  builds.forEach((sentence,bi)=>{
+    const target=sentence.replace(/[.?!]$/,'').split(' ').map((w,i)=> i===0 && !PROPER.has(w) ? w.toLowerCase() : w);
+    const order=shuffled(target.map((w,i)=>i), dayIndex*7+bi);
+    const wrapper=el('div','q');
+    const ans=el('div','answer'); ans.setAttribute('aria-live','polite');
+    const chips=el('div','chips');
+    let picked=[];
+    const draw=()=>{ ans.textContent=picked.map(i=>target[i]).join(' '); ans.className='answer'; };
+    order.forEach(i=>{
+      const c=el('button','chipw',target[i]); c.type='button';
+      c.addEventListener('click',()=>{ picked.push(i); c.disabled=true; draw(); });
+      chips.appendChild(c);
+    });
+    const act=el('div','s-act');
+    const check=el('button','btn small','확인'); check.type='button';
+    check.addEventListener('click',()=>{ const ok=picked.length===target.length && picked.every((v,k)=>v===k); ans.className='answer '+(ok?'right':'wrong'); if(ok) ans.textContent=sentence; });
+    const clear=el('button','btn small','지우기'); clear.type='button';
+    clear.addEventListener('click',()=>{ picked=[]; chips.querySelectorAll('button').forEach(b=>b.disabled=false); draw(); });
+    const show=el('button','btn small','정답'); show.type='button';
+    show.addEventListener('click',()=>{ picked=target.map((w,i)=>i); chips.querySelectorAll('button').forEach(b=>b.disabled=true); ans.textContent=sentence; ans.className='answer right'; });
+    act.appendChild(check); act.appendChild(clear); act.appendChild(show);
+    wrapper.appendChild(el('span','note','문장 '+(bi+1)));
+    wrapper.appendChild(ans); wrapper.appendChild(chips); wrapper.appendChild(act);
+    box.appendChild(wrapper);
+  });
+}
+function linkRow(items){
+  const d=el('div','links');
+  items.forEach(([t,u])=>{ const a=el('a',null,t); a.href=u; a.target='_blank'; a.rel='noopener'; d.appendChild(a); });
+  return d;
+}
+function bodyShadow(box){
+  box.appendChild(linkRow([
+    ['VOA Learning English (느리고 자막 있음, 처음엔 여기)','https://learningenglish.voanews.com/'],
+    ['BBC 6 Minute English','https://www.bbc.co.uk/learningenglish/english/features/6-minute-english'],
+    ['TED-Ed','https://ed.ted.com/']
+  ]));
+  const ol=el('ol','howlist');
+  ['자막 있는 1~2분 구간 고르기','자막 없이 1번 듣기','자막 보며 1번 듣기','자막 보며 동시에 따라 말하기 3번','마지막 1번은 음성메모로 녹음하고 들어보기'].forEach(t=>ol.appendChild(el('li',null,t)));
+  box.appendChild(ol);
+}
+function bodyInterview(box){
+  questions.forEach((q,i)=>{
+    const d=el('div','q');
+    d.appendChild(el('span','note','질문 '+(i+1)));
+    d.appendChild(el('p','qt en',q));
+    const b=el('button','btn small','▶ 15초 준비 + 45초 말하기'); b.type='button';
+    b.addEventListener('click',()=>startTimer(1,'질문 '+(i+1)+' · 15초 생각, 45초 말하기'));
+    d.appendChild(b);
+    box.appendChild(d);
+  });
+  const memo=el('textarea','short'); memo.id='speakMemo'; memo.placeholder='(선택) 내가 말한 내용을 기억나는 대로 영어로 적어 두면 코치가 고쳐 줘요.';
+  memo.value = state.memo[TK] || '';
+  memo.addEventListener('input',()=>{ state.memo[TK]=memo.value; save(); });
+  box.appendChild(memo);
+}
+function bodyWrite(box){
+  const p=el('div','prompt');
+  if(isAD){
+    p.appendChild(el('span','note','Write for an Academic Discussion · 10분 · 100단어 이상'));
+    const prof=el('p'); prof.appendChild(el('span','who','Professor: ')); prof.appendChild(document.createTextNode(adPrompt.prof)); p.appendChild(prof);
+    [adPrompt.a, adPrompt.b].forEach(st=>{ const q=el('p'); q.appendChild(el('span','who',st[0]+': ')); q.appendChild(document.createTextNode(st[1])); p.appendChild(q); });
+  }else{
+    p.appendChild(el('span','note','Write an Email · 7분 · 80단어 이상'));
+    p.appendChild(el('p',null,'Situation: '+emPrompt.sit));
+    p.appendChild(el('p',null,'Write an email to '+emPrompt.to+'. In your email:'));
+    const ul=el('ul','howlist'); emPrompt.pts.forEach(t=>ul.appendChild(el('li',null,t))); p.appendChild(ul);
+  }
+  box.appendChild(p);
+  const ta=el('textarea'); ta.id='draft'; ta.placeholder='여기에 영어로. 틀려도 멈추지 말고 끝까지.';
+  ta.value = state.drafts[draftKey] || '';
+  const wc=el('div','wc');
+  const goal = isAD?100:80;
+  const upd=()=>{ const n=words(ta.value); wc.textContent=''; wc.appendChild(el('span',null,n+' 단어 / 목표 '+goal)); wc.appendChild(el('span',null,'자동 저장')); wc.className='wc'+(n>=goal?' ok':''); };
+  ta.addEventListener('input',()=>{ state.drafts[draftKey]=ta.value; save(); upd(); });
+  upd();
+  box.appendChild(ta); box.appendChild(wc);
+}
+function bodyLecture(box){
+  box.appendChild(linkRow([['TED-Ed (4~6분, 자막)','https://ed.ted.com/'],['ETS 무료 샘플 테스트','https://www.ets.org/toefl/test-takers/ibt/prepare.html']]));
+  const b=el('button','btn small','▶ 60초 요약 말하기'); b.type='button';
+  b.addEventListener('click',()=>startTimer(1,'강의 요약 · 60초'));
+  box.appendChild(b);
+}
+function bodyCtest(box){
+  const d=el('div','ct');
+  const firstEnd=ctext.indexOf('. ')+1;
+  d.appendChild(document.createTextNode(ctext.slice(0,firstEnd)+' '));
+  const rest=ctext.slice(firstEnd+1).split(' ');
+  let count=0; let gaps=[];
+  rest.forEach((tok,i)=>{
+    const m=tok.match(/^([A-Za-z]+)(.*)$/);
+    count++;
+    if(m && count%2===0 && m[1].length>=3){
+      const w=m[1], keep=Math.ceil(w.length/2);
+      const g=el('span','gap', w.slice(0,keep)+'_'.repeat(w.length-keep)); g.tabIndex=0; g.setAttribute('role','button'); g.title='눌러서 확인';
+      const open=()=>{ g.textContent=w; g.classList.add('open'); };
+      g.addEventListener('click',open); g.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(); } });
+      gaps.push(open);
+      d.appendChild(g); d.appendChild(document.createTextNode(m[2]+(i<rest.length-1?' ':'')));
+    }else{
+      d.appendChild(document.createTextNode(tok+(i<rest.length-1?' ':'')));
+    }
+  });
+  box.appendChild(d);
+  const all=el('button','btn small','모두 보기'); all.type='button'; all.addEventListener('click',()=>gaps.forEach(f=>f()));
+  box.appendChild(all);
+}
+function bodyReview(box){
+  const y=new Date(today); y.setDate(y.getDate()-1); const yk=keyOf(y);
+  const yd = state.drafts[yk+':ad'] || state.drafts[yk+':em'];
+  if(yd){ box.appendChild(el('span','note','어제 쓴 글')); box.appendChild(el('div','yday',yd)); }
+  else box.appendChild(el('p','note','어제 쓴 글이 이 기기에 없어요. 오늘 글을 한 번 더 소리 내어 읽어요.'));
+}
+
+/* ---------- render run ---------- */
+let mode = null;
+function logToday(){ if(!state.log[TK]) state.log[TK]={modes:{},finished:0}; return state.log[TK]; }
+function renderRun(){
+  const list=stepsFor(mode);
+  const log=state.log[TK]; const done=(log&&log.modes&&log.modes[mode])||[];
+  $('runTotal').textContent='총 '+list.reduce((a,s)=>a+s.min,0)+'분';
+  const ol=$('steps'); ol.textContent='';
+  list.forEach((s,i)=>{
+    const li=el('li','step'+(done[i]?' done':'')); li.dataset.i=i;
+    const head=el('div','s-head'); head.appendChild(el('span','s-n',String(i+1))); head.appendChild(el('h3','s-title',s.title)); head.appendChild(el('span','s-min',s.min+'분'));
+    li.appendChild(head);
+    li.appendChild(el('p','s-how',s.how));
+    const body=el('div','s-body'); s.body(body); li.appendChild(body);
+    const act=el('div','s-act');
+    const start=el('button','btn primary','▶ '+s.min+'분'); start.type='button'; start.addEventListener('click',()=>startTimer(s.min,(i+1)+'단계 '+s.title));
+    const dn=el('button','btn'+(done[i]?' good':''), done[i]?'✓ 했다':'했다'); dn.type='button';
+    dn.addEventListener('click',()=>{ const l=logToday(); l.modes[mode]=l.modes[mode]||[]; l.modes[mode][i]=!l.modes[mode][i]; if(l.modes[mode].filter(Boolean).length===list.length) l.finished=Math.max(l.finished||0,mode); else if(l.finished===mode) l.finished=0; save(); renderRun(); renderLedger(); });
+    act.appendChild(start); act.appendChild(dn); li.appendChild(act);
+    ol.appendChild(li);
+  });
+  $('finish').hidden = !(log && log.finished && log.finished>=mode);
+}
+function setMode(m, persist){
+  mode=m; if(persist){ state.mode=m; save(); }
+  document.querySelectorAll('.mode').forEach(b=>b.setAttribute('aria-pressed', String(Number(b.dataset.mode)===m)));
+  renderRun();
+}
+document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>setMode(Number(b.dataset.mode),true)));
+const startMode = (state.log[TK] && state.log[TK].finished) ? state.log[TK].finished : (gap>=3 && !state.log[TK] ? 5 : (state.mode||25));
+setMode(startMode,false);
+
+/* ---------- timer ---------- */
+let tId=null, tEnd=0, audio=null;
+function beep(){ try{ if(!audio) audio=new (window.AudioContext||window.webkitAudioContext)(); const o=audio.createOscillator(), g=audio.createGain(); o.frequency.value=880; o.connect(g); g.connect(audio.destination); g.gain.setValueAtTime(0.0001,audio.currentTime); g.gain.exponentialRampToValueAtTime(0.2,audio.currentTime+0.02); g.gain.exponentialRampToValueAtTime(0.0001,audio.currentTime+0.6); o.start(); o.stop(audio.currentTime+0.6); }catch(e){} }
+function fmt(ms){ const s=Math.max(0,Math.ceil(ms/1000)); return pad(Math.floor(s/60))+':'+pad(s%60); }
+function startTimer(min,label){
+  try{ if(!audio){ audio=new (window.AudioContext||window.webkitAudioContext)(); } if(audio.state==='suspended') audio.resume(); }catch(e){}
+  clearInterval(tId); tEnd=Date.now()+min*60000;
+  $('tLabel').textContent=label; $('tTime').className='t-time'; $('tTime').textContent=fmt(tEnd-Date.now()); $('timerbar').hidden=false;
+  tId=setInterval(()=>{ const left=tEnd-Date.now(); $('tTime').textContent=fmt(left); if(left<=0){ clearInterval(tId); tId=null; $('tTime').textContent='끝'; $('tTime').className='t-time over'; beep(); } },250);
+}
+$('tStop').addEventListener('click',()=>{ clearInterval(tId); tId=null; $('timerbar').hidden=true; });
+
+/* ---------- coach ---------- */
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.hidden=false; clearTimeout(toast._id); toast._id=setTimeout(()=>{ t.hidden=true; },3500); }
+async function copyText(text,msg){
+  const m = msg || '복사했어요. 클로드 창에 붙여 넣으세요.';
+  try{ await navigator.clipboard.writeText(text); toast(m); $('fallback').hidden=true; return; }catch(e){}
+  const fb=$('fallbackText'); fb.value=text; $('fallback').hidden=false; fb.focus(); fb.select();
+  try{ if(document.execCommand('copy')){ toast(m); return; } }catch(e){}
+  toast('아래 글을 직접 복사하세요.');
+}
+function flat(t){ return (t||'').replace(/\t/g,' ').replace(/\r?\n+/g,' / ').trim(); }
+function sheetRow(){
+  const l=state.log[TK]; const m = (l && l.finished) ? l.finished : (mode||'');
+  const task = isAD ? 'Academic Discussion' : 'Email';
+  const promptText = isAD
+    ? 'Professor: '+adPrompt.prof+' / '+adPrompt.a[0]+': '+adPrompt.a[1]+' / '+adPrompt.b[0]+': '+adPrompt.b[1]
+    : 'To '+emPrompt.to+'. '+emPrompt.sit+' Include: '+emPrompt.pts.join('; ')+'.';
+  return [TK, m, task, flat(promptText), flat(state.drafts[draftKey]), flat(questions.join(' | ')), flat(state.memo[TK]), '', ''].join('\t');
+}
+function writePrompt(){
+  const draft=(state.drafts[draftKey]||'').trim();
+  let task;
+  if(isAD) task='Write for an Academic Discussion\nProfessor: '+adPrompt.prof+'\n'+adPrompt.a[0]+': '+adPrompt.a[1]+'\n'+adPrompt.b[0]+': '+adPrompt.b[1];
+  else task='Write an Email\nSituation: '+emPrompt.sit+'\nWrite to '+emPrompt.to+'. Include: '+emPrompt.pts.join('; ')+'.';
+  return '[오늘의 토플 · 쓰기 제출] '+TK+'\n\n과제:\n'+task+'\n\n내 답:\n'+(draft||'(아직 안 썼어요)')+'\n\n요청: 새 토플(1~6 밴드) 채점관처럼 밴드를 매기고, 가장 큰 문제 1개, 고친 문장 3개, 다음에 바로 쓸 표현 3개만 짧게. 한국어로 설명해 줘.';
+}
+function speakPrompt(){
+  const memo=(state.memo[TK]||'').trim();
+  return '[오늘의 토플 · 말하기 제출] '+TK+'\n\n질문 1: '+questions[0]+'\n질문 2: '+questions[1]+'\n\n내가 말한 내용(기억나는 대로):\n'+(memo||'(메모 없음)')+'\n\n요청: 각 질문에 45초짜리 자연스러운 모델 답안을 하나씩 써 주고, 내가 바로 쓸 연결 표현 3개만. 내 메모가 있으면 고칠 점 2개도. 한국어로 설명해 줘.';
+}
+$('copyWrite').addEventListener('click',()=>copyText(writePrompt()));
+$('copySpeak').addEventListener('click',()=>copyText(speakPrompt()));
+$('copySheet').addEventListener('click',()=>copyText(sheetRow(),'복사했어요. 시트의 빈 줄 첫 칸에 붙여 넣으면 칸마다 나뉘어 들어가요.'));
+
+/* ---------- ledger ---------- */
+function renderLedger(){
+  const c=$('cells'); c.textContent=''; let n=0;
+  for(let i=13;i>=0;i--){
+    const d=new Date(today); d.setDate(d.getDate()-i); const k=keyOf(d); const l=state.log[k];
+    const cell=el('div','cell'+(k===TK?' today':''));
+    cell.appendChild(el('span',null,(d.getMonth()+1)+'/'+d.getDate()));
+    if(l && l.finished){ cell.classList.add('full'); cell.appendChild(el('b',null,String(l.finished))); n++; }
+    else if(l && l.modes && Object.values(l.modes).some(a=>a&&a.some(Boolean))){ cell.classList.add('part'); cell.appendChild(el('b',null,'·')); n++; }
+    else cell.appendChild(el('b',null,' '));
+    c.appendChild(cell);
+  }
+  $('ledgerNote').textContent = n===0 ? '첫 칸을 채우면 여기에 남아요. 연속 기록은 세지 않아요. 돌아오는 날이 중요해요.' : '최근 14일 중 '+n+'일 열었어요. 연속 기록은 세지 않아요. 돌아오는 날이 중요해요.';
+}
+renderLedger();
+
+/* ---------- road: mark current phase ---------- */
+document.querySelectorAll('#roadBody tr').forEach(tr=>{ if(TK>=tr.dataset.from && TK<=tr.dataset.to) tr.classList.add('now'); });
+})();
+</script>
+
+</body>
+</html>
