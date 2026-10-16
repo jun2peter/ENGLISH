@@ -70,6 +70,16 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,.gap:focus-visib
 .hw b{font-weight:600}
 .hw .sub{color:var(--muted); font-size:.9rem}
 .week td:first-child{white-space:nowrap; font-weight:600}
+.extra{display:flex; flex-direction:column; gap:10px}
+.xlist{display:flex; flex-direction:column; gap:12px}
+.xgroup{display:flex; flex-direction:column; gap:6px}
+.xgroup h3{font-size:.9rem; color:var(--muted); font-family:var(--body); font-weight:600; letter-spacing:.04em}
+.xitem{display:flex; gap:10px; align-items:flex-start; padding:8px 10px; border:1px solid var(--line); border-radius:6px; background:var(--surface); cursor:pointer}
+.xitem input{margin-top:5px; flex:none}
+.xitem .xt{font-weight:500}
+.xitem .xd{font-size:.88rem; color:var(--muted)}
+.xitem.on{opacity:.55}
+.xitem.on .xt{text-decoration:line-through}
 .week tr.now td{background:var(--accent-soft)}
 
 /* modes */
@@ -227,6 +237,12 @@ footer{color:var(--muted); font-size:.84rem; border-top:1px solid var(--line); p
     <div class="run-head"><strong id="runTotal">총 25분</strong><span class="run-hint">▶를 누르면 타이머가 돌아요. 끝낸 단계는 ✓. 문제가 안 맞으면 "다른 문제".</span><button class="btn small ghost" id="repick" type="button">세트 다시 뽑기</button></div>
     <ol class="steps" id="steps"><li class="loading">문제를 불러오는 중이에요.</li></ol>
     <p class="finish" id="finish" hidden>오늘 몫 끝. 다음에 또 열면 그다음 문제부터 나와요.</p>
+  </section>
+
+  <section class="extra" id="extra" hidden>
+    <h2>시간 남으면</h2>
+    <p class="note">필수가 아니에요. 위 숙제를 끝낸 날, 힘이 남을 때만. 교재와 다른 일은 여기에만 있어요. 체크는 이 기기에만 남고, 진짜 완료는 시트 "추가" 탭의 상태 칸에 '완료'.</p>
+    <div id="extraList" class="xlist"></div>
   </section>
 
   <section class="coach">
@@ -445,6 +461,36 @@ async function loadWeek(){
     const w=rows.map(r=>({d:String(r['요일']||'').trim().slice(0,1),mode:Number(r['모드'])||25,when:String(r['언제']||'').trim(),what:String(r['딱 이것만']||'').trim(),listen:String(r['흘려듣기']||'').trim()})).filter(x=>DAYS.includes(x.d)&&x.what);
     if(w.length>=5){ WEEK=DAYS.map((d,i)=>w.find(x=>x.d===d)||WEEK[i]); }
   }catch(e){}
+}
+
+/* ---------- extra homework (sheet tab 추가) ---------- */
+let EXTRA=[];
+async function loadExtra(){
+  try{
+    const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),8000);
+    const url='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:json&headers=1&sheet='+encodeURIComponent('추가')+'&_='+Date.now();
+    const res=await fetch(url,{signal:ctrl.signal,cache:'no-store'}); clearTimeout(t);
+    if(!res.ok) return;
+    const rows=parseGviz(await res.text());
+    EXTRA=rows.map(r=>({g:String(r['구분']||'').trim(),t:String(r['항목']||'').trim(),d:String(r['설명']||'').trim(),s:String(r['상태']||'').trim()})).filter(x=>x.t&&!/완료|보류/.test(x.s));
+  }catch(e){}
+}
+function renderExtra(){
+  const sec=$('extra'), list=$('extraList'); list.textContent='';
+  if(!EXTRA.length){ sec.hidden=true; return; }
+  sec.hidden=false; state.extra=state.extra||{};
+  const groups=[]; EXTRA.forEach(x=>{ let g=groups.find(k=>k.name===x.g); if(!g){ g={name:x.g||'기타',items:[]}; groups.push(g); } g.items.push(x); });
+  groups.forEach(g=>{
+    const box=el('div','xgroup'); box.appendChild(el('h3',null,g.name));
+    g.items.forEach(x=>{
+      const id=hash(x.t); const on=!!state.extra[id];
+      const row=el('label','xitem'+(on?' on':'')); const cb=el('input'); cb.type='checkbox'; cb.checked=on; cb.id='x-'+id;
+      cb.addEventListener('change',()=>{ if(cb.checked) state.extra[id]=TK; else delete state.extra[id]; save(); row.classList.toggle('on',cb.checked); });
+      const txt=el('div'); txt.appendChild(el('div','xt',x.t)); if(x.d) txt.appendChild(el('div','xd',x.d));
+      row.appendChild(cb); row.appendChild(txt); box.appendChild(row);
+    });
+    list.appendChild(box);
+  });
 }
 
 /* ---------- returning notice ---------- */
@@ -758,8 +804,8 @@ document.querySelectorAll('#roadBody tr').forEach(tr=>{ if(TK>=tr.dataset.from&&
 
 /* ---------- boot ---------- */
 (async function(){
-  await Promise.all([loadBank(),loadWeek()]);
-  renderHw(); renderWeek();
+  await Promise.all([loadBank(),loadWeek(),loadExtra()]);
+  renderHw(); renderWeek(); renderExtra();
   const startMode=(state.log[TK]&&state.log[TK].finished)?state.log[TK].finished:(gap>=3&&!state.log[TK]?5:((state.modeDate===TK&&state.mode)?state.mode:RX.mode));
   setMode(startMode,false);
   renderLedger();
